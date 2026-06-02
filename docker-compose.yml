@@ -11,30 +11,32 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      target: app
       args:
-        - GIT_HASH=${GIT_HASH:-unknown}
+        GIT_HASH: ${GIT_HASH:-unknown}
     container_name: digisejahtera_app
     restart: unless-stopped
     working_dir: /var/www/digisejahtera
-    env_file: ./.env
+    env_file:
+      - ./.env
     volumes:
       - app_storage:/var/www/digisejahtera/storage
       - laravel_cache:/var/www/digisejahtera/bootstrap/cache
     networks:
       - shared-network
-  
+
   nginx-digisejahtera:
-    image: nginx:alpine
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: web
     container_name: digisejahtera_nginx
     restart: unless-stopped
     environment:
-      - VIRTUAL_HOST=digisejahtera.s1gro.online
-      - LETSENCRYPT_HOST=digisejahtera.s1gro.online
-      - LETSENCRYPT_EMAIL=ahmadfauzanroziqin@gmail.com
-    volumes:
-      - .:/var/www/digisejahtera:ro
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      VIRTUAL_HOST: digisejahtera.s1gro.online
+      LETSENCRYPT_HOST: digisejahtera.s1gro.online
+      LETSENCRYPT_EMAIL: ahmadfauzanroziqin@gmail.com
     networks:
-      - shared-network 
+      - shared-network
     depends_on:
-      - app-digisejahtera  
+      - app-digisejahtera
