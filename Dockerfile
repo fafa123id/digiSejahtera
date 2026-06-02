@@ -67,7 +67,7 @@ WORKDIR /var/www/digisejahtera
 
 COPY package*.json ./
 RUN npm install
-
+COPY --from=composer_deps /app/vendor ./vendor
 COPY tailwind.config.js postcss.config.js vite.config.js ./
 COPY resources ./resources
 
