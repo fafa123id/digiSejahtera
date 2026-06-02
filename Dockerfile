@@ -1,61 +1,93 @@
+# =========================
+# Stage 0: PHP base (runtime + build deps)
+# =========================
 FROM php:8.4-fpm AS php_base
 
-RUN apt-get update && apt-get install -y \
-    libpng-dev \
-    libjpeg-dev \
-    libfreetype6-dev \
-    libpq-dev \
-    zip \
-    unzip \
-    netcat-openbsd \
-    git \
-    curl \
-    libonig-dev \
-    libxml2-dev \
-    supervisor \
-    && pecl install redis \
-    && docker-php-ext-enable redis \
-    && docker-php-ext-install pdo_pgsql mbstring exif pcntl bcmath gd
+# Sistem & build deps untuk ekstensi
+RUN set -eux; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends \
+      libpng-dev \
+      libjpeg-dev \
+      libfreetype6-dev \
+      libpq-dev \
+      libonig-dev \
+      pkg-config \
+      zip \
+      unzip \
+      netcat-openbsd \
+      git \
+      curl \
+      libxml2-dev \
+      supervisor \
+      $PHPIZE_DEPS \
+    ; \
+    pecl install redis; \
+    docker-php-ext-enable redis; \
+    docker-php-ext-configure gd --with-freetype --with-jpeg; \
+    docker-php-ext-install -j"$(nproc)" \
+      mbstring exif pcntl bcmath gd pdo_mysql pdo_pgsql pgsql \
+    ; \
+    rm -rf /var/lib/apt/lists/*
 
+# Composer CLI
 COPY --from=composer:2.8.10 /usr/bin/composer /usr/bin/composer
+
 WORKDIR /var/www/digisejahtera
 
+
+# =========================
+# Stage 1: Composer deps (vendor)
+# =========================
+FROM composer:2.8.10 AS composer_deps
+WORKDIR /app
+COPY composer.json composer.lock ./
+
+RUN composer install --no-dev --no-interaction --no-scripts --prefer-dist --no-progress
+
+
+# =========================
+# Stage 2: Vite build (Node)
+# =========================
 FROM node:22-alpine AS vite_build
 WORKDIR /var/www/digisejahtera
+
 COPY package*.json ./
-RUN npm install
+RUN npm ci
+
+COPY --from=composer_deps /app/vendor ./vendor
+
 COPY tailwind.config.js postcss.config.js vite.config.js ./
 COPY resources ./resources
+
+COPY .env.production ./.env.production 
 RUN npm run build
 
-
+# =========================
+# Stage 3: App (PHP-FPM runtime + code)
+# =========================
 FROM php_base AS app
-
 WORKDIR /var/www/digisejahtera
+RUN ln -s /var/www/digisejahtera /var/www/digisejahtera
 
-ARG GIT_HASH
-
-RUN echo ${GIT_HASH} > .version
+ARG GIT_HASH=unknown
+RUN echo "${GIT_HASH}" > .version
 
 COPY . .
 
 COPY --from=vite_build /var/www/digisejahtera/public/build ./public/build
+COPY --from=composer_deps /app/vendor ./vendor
 
 
-RUN composer install --no-scripts --no-dev --prefer-dist --no-interaction --optimize-autoloader
+RUN composer dump-autoload --no-dev --optimize --classmap-authoritative
 
-RUN php artisan key:generate --force
-RUN php artisan view:clear
-RUN php artisan route:clear
-RUN php artisan config:clear
+RUN php artisan key:generate --force || true \
+ && php artisan view:clear || true \
+ && php artisan route:clear || true \
+ && php artisan config:clear || true
 
-RUN chown -R www-data:www-data storage bootstrap/cache
-RUN chmod -R 775 storage bootstrap/cache
-
-COPY entrypoint.sh /usr/local/bin/
-RUN chmod +x /usr/local/bin/entrypoint.sh
-
-ENTRYPOINT ["entrypoint.sh"]
+RUN chown -R www-data:www-data storage bootstrap/cache \
+ && chmod -R 775 storage bootstrap/cache
 
 EXPOSE 9000
 CMD ["php-fpm"]

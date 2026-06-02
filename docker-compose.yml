@@ -1,38 +1,40 @@
+networks:
+  shared-network:
+    external: true
+
+volumes:
+  app_storage:
+  laravel_cache:
+
 services:
   app-digisejahtera:
     build:
       context: .
       dockerfile: Dockerfile
       args:
-        - GIT_HASH=${GIT_HASH}
+        - GIT_HASH=${GIT_HASH:-unknown}
+    container_name: digisejahtera_app
     restart: unless-stopped
     working_dir: /var/www/digisejahtera
-    env_file:
-      - ./.env
+    env_file: ./.env
     volumes:
-      - app_vol:/var/www/digisejahtera
+      - app_storage:/var/www/digisejahtera/storage
+      - laravel_cache:/var/www/digisejahtera/bootstrap/cache
     networks:
       - shared-network
   
-  web-digisejahtera:
+  nginx-digisejahtera:
     image: nginx:alpine
+    container_name: digisejahtera_nginx
     restart: unless-stopped
     environment:
       - VIRTUAL_HOST=digisejahtera.s1gro.online
       - LETSENCRYPT_HOST=digisejahtera.s1gro.online
       - LETSENCRYPT_EMAIL=ahmadfauzanroziqin@gmail.com
     volumes:
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf
-      - app_vol:/var/www/digisejahtera
+      - .:/var/www/digisejahtera:ro
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
     networks:
-      - shared-network
+      - shared-network 
     depends_on:
-      - app-digisejahtera
-
-networks:
-  shared-network:
-    external: true
-
-volumes:
-  app_vol:
-    name: ${COMPOSE_PROJECT_NAME}_app_vol
+      - app-digisejahtera  
