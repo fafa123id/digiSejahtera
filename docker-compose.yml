@@ -5,7 +5,6 @@ networks:
 volumes:
   app_storage:
   laravel_cache:
-  public_assets:
 
 services:
   app-digisejahtera:
@@ -21,10 +20,9 @@ services:
     volumes:
       - app_storage:/var/www/digisejahtera/storage
       - laravel_cache:/var/www/digisejahtera/bootstrap/cache
-      - public_assets:/var/www/digisejahtera/public
     networks:
       - shared-network
-
+  
   nginx-digisejahtera:
     image: nginx:alpine
     container_name: digisejahtera_nginx
@@ -34,9 +32,9 @@ services:
       - LETSENCRYPT_HOST=digisejahtera.s1gro.online
       - LETSENCRYPT_EMAIL=ahmadfauzanroziqin@gmail.com
     volumes:
-      - public_assets:/var/www/digisejahtera/public:ro
+      - .:/var/www/digisejahtera:ro
       - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
     networks:
-      - shared-network
+      - shared-network 
     depends_on:
-      - app-digisejahtera
+      - app-digisejahtera  
