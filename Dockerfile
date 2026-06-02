@@ -53,7 +53,7 @@ FROM node:22-alpine AS vite_build
 WORKDIR /var/www/digisejahtera
 
 COPY package*.json ./
-RUN npm ci
+RUN npm install
 
 COPY --from=composer_deps /app/vendor ./vendor
 
