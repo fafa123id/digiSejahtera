@@ -9,18 +9,30 @@ import { Link } from '@inertiajs/vue3';
 const showingNavigationDropdown = ref(false);
 const scrollY = ref(0);
 const isScrolled = ref(false);
+const windowWidth = ref(768);
 
 const handleScroll = () => {
   scrollY.value = window.scrollY;
   isScrolled.value = window.scrollY > 60;
+  // Auto-close responsive menu on scroll
+  if (showingNavigationDropdown.value) {
+    showingNavigationDropdown.value = false;
+  }
+};
+
+const handleResize = () => {
+  windowWidth.value = window.innerWidth;
 };
 
 onMounted(() => {
   window.addEventListener('scroll', handleScroll);
+  window.addEventListener('resize', handleResize);
+  handleResize();
 });
 
 onUnmounted(() => {
   window.removeEventListener('scroll', handleScroll);
+  window.removeEventListener('resize', handleResize);
 });
 </script>
 
@@ -84,7 +96,7 @@ onUnmounted(() => {
         </nav>
 
         <!-- Responsive Navigation Menu -->
-        <div :class="{ 'block': showingNavigationDropdown, 'hidden': !showingNavigationDropdown }" class="ds-nav__responsive sm:hidden">
+        <div :class="{ 'ds-nav__responsive--open': showingNavigationDropdown }" class="ds-nav__responsive sm:hidden">
             <div class="ds-nav__responsive-content">
                 <ResponsiveNavLink :href="route('dashboard')" :active="route().current('dashboard')">
                     Dashboard
@@ -121,7 +133,7 @@ onUnmounted(() => {
             </header>
 
             <!-- Page Content -->
-            <main>
+            <main class="ds-main-content" :class="{ 'ds-main-content--responsive-open': showingNavigationDropdown && windowWidth < 768 }" @click="showingNavigationDropdown = false">
                 <slot />
             </main>
         </div>
@@ -298,15 +310,40 @@ onUnmounted(() => {
 
 /* Responsive Menu */
 .ds-nav__responsive {
+  position: fixed;
+  top: 72px;
+  left: 0;
+  right: 0;
+  z-index: 99;
   background: white;
   border-bottom: 1px solid var(--gray-200);
+  box-shadow: var(--shadow-md);
   transition: all 0.3s ease;
-  max-height: 500px;
+  max-height: 0;
+  overflow: hidden;
+  visibility: hidden;
+}
+
+.ds-nav__responsive--open {
+  max-height: calc(100vh - 72px);
+  visibility: visible;
   overflow-y: auto;
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .ds-nav__responsive-content {
-  padding: 12px 0;
+  padding: 12px 16px;
   display: flex;
   flex-direction: column;
   gap: 0;
@@ -325,7 +362,7 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  padding: 0 16px;
+  padding: 0 8px;
 }
 
 .ds-nav__responsive-user-name {
@@ -344,6 +381,29 @@ onUnmounted(() => {
   flex-direction: column;
   gap: 4px;
   padding: 0;
+}
+
+.ds-main-content {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  transition: all 0.3s ease;
+}
+
+.ds-main-content--responsive-open {
+  padding-top: 180px;
+}
+
+/* Fix dropdown positioning to stay below navbar */
+:deep(.dropdown) {
+  z-index: 98;
+}
+
+:deep(.dropdown-content) {
+  z-index: 98;
+  position: absolute;
+  top: 100%;
+  margin-top: 4px;
 }
 
 /* ═══ ANIMATIONS ═══ */
