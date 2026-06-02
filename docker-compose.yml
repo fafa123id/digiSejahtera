@@ -1,0 +1,39 @@
+services:
+  app-digisejahtera:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - GIT_HASH=${GIT_HASH}
+    restart: unless-stopped
+    working_dir: /var/www/digisejahtera
+    env_file:
+      - ./.env
+    volumes:
+      - app_vol:/var/www/digisejahtera
+    networks:
+      - shared-network
+  
+  web-digisejahtera:
+    image: nginx:alpine
+    restart: unless-stopped
+    environment:
+      - VIRTUAL_HOST=digisejahtera.s1gro.online
+      - LETSENCRYPT_HOST=digisejahtera.s1gro.online
+      - LETSENCRYPT_EMAIL=ahmadfauzanroziqin@gmail.com
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+      - app_vol:/var/www/digisejahtera
+    networks:
+      - shared-network
+    depends_on:
+      - app-digisejahtera
+      - worker-digisejahtera
+
+networks:
+  shared-network:
+    external: true
+
+volumes:
+  app_vol:
+    name: ${COMPOSE_PROJECT_NAME}_app_vol
