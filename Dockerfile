@@ -22,7 +22,7 @@ WORKDIR /var/www/digisejahtera
 FROM node:22-alpine AS vite_build
 WORKDIR /var/www/digisejahtera
 COPY package*.json ./
-RUN npm ci
+RUN npm install
 COPY tailwind.config.js postcss.config.js vite.config.js ./
 COPY resources ./resources
 RUN npm run build
