@@ -5,30 +5,30 @@ FROM php:8.4-fpm AS php_base
 
 # Sistem & build deps untuk ekstensi
 RUN set -eux; \
-    apt-get update; \
-    apt-get install -y --no-install-recommends \
-      libpng-dev \
-      libjpeg-dev \
-      libfreetype6-dev \
-      libpq-dev \
-      libonig-dev \
-      pkg-config \
-      zip \
-      unzip \
-      netcat-openbsd \
-      git \
-      curl \
-      libxml2-dev \
-      supervisor \
-      $PHPIZE_DEPS \
-    ; \
-    pecl install redis; \
-    docker-php-ext-enable redis; \
-    docker-php-ext-configure gd --with-freetype --with-jpeg; \
-    docker-php-ext-install -j"$(nproc)" \
-      mbstring exif pcntl bcmath gd pdo_mysql pdo_pgsql pgsql \
-    ; \
-    rm -rf /var/lib/apt/lists/*
+  apt-get update; \
+  apt-get install -y --no-install-recommends \
+  libpng-dev \
+  libjpeg-dev \
+  libfreetype6-dev \
+  libpq-dev \
+  libonig-dev \
+  pkg-config \
+  zip \
+  unzip \
+  netcat-openbsd \
+  git \
+  curl \
+  libxml2-dev \
+  supervisor \
+  $PHPIZE_DEPS \
+  ; \
+  pecl install redis; \
+  docker-php-ext-enable redis; \
+  docker-php-ext-configure gd --with-freetype --with-jpeg; \
+  docker-php-ext-install -j"$(nproc)" \
+  mbstring exif pcntl bcmath gd pdo_mysql pdo_pgsql pgsql \
+  ; \
+  rm -rf /var/lib/apt/lists/*
 
 # Composer CLI
 COPY --from=composer:2.8.10 /usr/bin/composer /usr/bin/composer
@@ -80,12 +80,21 @@ COPY --from=composer_deps /app/vendor ./vendor
 RUN composer dump-autoload --no-dev --optimize --classmap-authoritative
 
 RUN php artisan key:generate --force || true \
- && php artisan view:clear || true \
- && php artisan route:clear || true \
- && php artisan config:clear || true
+  && php artisan view:clear || true \
+  && php artisan route:clear || true \
+  && php artisan config:clear || true
 
 RUN chown -R www-data:www-data storage bootstrap/cache \
- && chmod -R 775 storage bootstrap/cache
+  && chmod -R 775 storage bootstrap/cache
 
 EXPOSE 9000
 CMD ["php-fpm"]
+# =========================
+# Stage 4: Nginx web server
+# =========================
+FROM nginx:alpine AS web
+
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY --from=app /var/www/digisejahtera/public /var/www/digisejahtera/public
+
+EXPOSE 80
