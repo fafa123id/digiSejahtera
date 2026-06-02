@@ -59,8 +59,6 @@ COPY --from=composer_deps /app/vendor ./vendor
 
 COPY tailwind.config.js postcss.config.js vite.config.js ./
 COPY resources ./resources
-
-COPY .env.production ./.env.production 
 RUN npm run build
 
 # =========================
