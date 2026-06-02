@@ -28,7 +28,6 @@ services:
       - shared-network
     depends_on:
       - app-digisejahtera
-      - worker-digisejahtera
 
 networks:
   shared-network:
