@@ -70,6 +70,7 @@ RUN npm install
 COPY --from=composer_deps /app/vendor ./vendor
 COPY tailwind.config.js postcss.config.js vite.config.js ./
 COPY resources ./resources
+COPY .env ./.env
 
 RUN npm run build
 
@@ -96,6 +97,9 @@ RUN php artisan key:generate --force || true \
   && php artisan view:clear || true \
   && php artisan route:clear || true \
   && php artisan config:clear || true
+RUN php artisan config:cache || true \
+  && php artisan route:cache || true \
+  && php artisan view:cache || true
 RUN chown -R www-data:www-data storage bootstrap/cache \
   && chmod -R 775 storage bootstrap/cache
 
