@@ -96,6 +96,8 @@ RUN php artisan key:generate --force || true \
   && php artisan view:clear || true \
   && php artisan route:clear || true \
   && php artisan config:clear || true
+RUN php artisan optimize:clear || true \
+  && php artisan optimize || true
 RUN chown -R www-data:www-data storage bootstrap/cache \
   && chmod -R 775 storage bootstrap/cache
 
