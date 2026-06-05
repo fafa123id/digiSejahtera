@@ -2,31 +2,63 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Database\Factories\UserFactory;
-use Illuminate\Database\Eloquent\Attributes\Fillable;
-use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['name', 'email', 'password'])]
-#[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
-    /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
+    public const ROLE_ADMIN = 'admin';
+    public const ROLE_PENGURUS = 'pengurus';
+
+    protected $fillable = [
+        'name',
+        'username',
+        'email',
+        'password',
+        'role',
+        'must_change_password',
+    ];
+
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
+
     protected function casts(): array
     {
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'must_change_password' => 'boolean',
         ];
+    }
+
+    public function simpanansDibuat(): HasMany
+    {
+        return $this->hasMany(Simpanan::class, 'created_by');
+    }
+
+    public function pinjamansDibuat(): HasMany
+    {
+        return $this->hasMany(Pinjaman::class, 'created_by');
+    }
+
+    public function angsuransDibuat(): HasMany
+    {
+        return $this->hasMany(Angsuran::class, 'created_by');
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->role === self::ROLE_ADMIN;
+    }
+
+    public function isPengurus(): bool
+    {
+        return $this->role === self::ROLE_PENGURUS;
     }
 }
