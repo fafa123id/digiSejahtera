@@ -46,13 +46,13 @@ const submit = () => {
         <form @submit.prevent="submit" class="ds-form">
             <!-- Email field -->
             <div class="ds-form-group">
-                <InputLabel for="email" value="Email" />
+                <InputLabel for="email" value="Email atau username" />
                 <TextInput
                     id="email"
-                    type="email"
+                    type="text"
                     class="ds-input"
                     v-model="form.email"
-                    placeholder="nama@email.com"
+                    placeholder="nama@email.com atau username"
                     required
                     autofocus
                     autocomplete="username"

@@ -1,430 +1,341 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
-import Dropdown from '@/Components/Dropdown.vue';
-import DropdownLink from '@/Components/DropdownLink.vue';
-import NavLink from '@/Components/NavLink.vue';
-import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue';
-import { Link } from '@inertiajs/vue3';
+import { Link, usePage } from '@inertiajs/vue3'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 
-const showingNavigationDropdown = ref(false);
-const scrollY = ref(0);
-const isScrolled = ref(false);
-const windowWidth = ref(768);
+const page = usePage()
 
-const handleScroll = () => {
-  scrollY.value = window.scrollY;
-  isScrolled.value = window.scrollY > 60;
-  // Auto-close responsive menu on scroll
-  if (showingNavigationDropdown.value) {
-    showingNavigationDropdown.value = false;
+const sidebarOpen = ref(false)
+const profileMenuOpen = ref(false)
+
+const user = computed(() => {
+  return page.props.auth?.user
+})
+
+const menus = [
+  {
+    label: 'Dashboard',
+    href: '/dashboard',
+    icon: 'dashboard',
+  },
+  {
+    label: 'Kartu Rekening',
+    href: '/kartu-rekening',
+    icon: 'card',
+  },
+  {
+    label: 'Data Pengurus',
+    href: '/pengurus',
+    icon: 'users',
+    adminOnly: true,
+  },
+  {
+    label: 'Laporan',
+    href: '/laporan',
+    icon: 'report',
+  },
+]
+
+const visibleMenus = computed(() => {
+  return menus.filter((menu) => {
+    return !menu.adminOnly || user.value?.role === 'admin'
+  })
+})
+
+const isActive = (href) => {
+  return page.url.startsWith(href)
+}
+
+const closeProfileMenu = (event) => {
+  if (!event.target.closest('[data-profile-menu]')) {
+    profileMenuOpen.value = false
   }
-};
-
-const handleResize = () => {
-  windowWidth.value = window.innerWidth;
-};
+}
 
 onMounted(() => {
-  window.addEventListener('scroll', handleScroll);
-  window.addEventListener('resize', handleResize);
-  handleResize();
-});
+  window.addEventListener('click', closeProfileMenu)
+})
 
 onUnmounted(() => {
-  window.removeEventListener('scroll', handleScroll);
-  window.removeEventListener('resize', handleResize);
-});
+  window.removeEventListener('click', closeProfileMenu)
+})
 </script>
 
 <template>
-    <div class="authenticated-layout">
-        <!-- ═══════════════════ NAVBAR ═══════════════════ -->
-        <nav :class="['ds-nav', { 'ds-nav--scrolled': isScrolled }]">
-            <div class="ds-nav__inner">
-                <div class="ds-nav__brand">
-                    <div class="ds-nav__logo-wrap">
-                        <img src="/images/logo.png" alt="DigiSejahtera" class="ds-nav__logo-img" />
-                    </div>
-                    <Link :href="route('dashboard')" class="ds-nav__brand-text">
-                        <span class="ds-brand-digi">Digi</span><span class="ds-brand-sejahtera">Sejahtera</span>
-                    </Link>
-                </div>
+  <div class="min-h-screen bg-[#f4f8ff] text-slate-800">
+    <!-- Overlay sidebar mobile -->
+    <Transition
+      enter-active-class="transition-opacity duration-200"
+      leave-active-class="transition-opacity duration-200"
+      enter-from-class="opacity-0"
+      leave-to-class="opacity-0"
+    >
+      <button
+        v-if="sidebarOpen"
+        type="button"
+        class="fixed inset-0 z-30 bg-slate-950/30 backdrop-blur-sm lg:hidden"
+        aria-label="Tutup sidebar"
+        @click="sidebarOpen = false"
+      />
+    </Transition>
 
-                <!-- Desktop Navigation -->
-                <div class="ds-nav__desktop-menu">
-                    <NavLink :href="route('dashboard')" :active="route().current('dashboard')">
-                        Dashboard
-                    </NavLink>
-                </div>
+    <!-- Sidebar -->
+    <aside
+      class="fixed inset-y-0 left-0 z-40 flex w-72 flex-col border-r border-blue-100 bg-white/95 shadow-[0_10px_40px_rgba(26,111,189,0.12)] backdrop-blur-xl transition-transform duration-300 lg:translate-x-0"
+      :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
+    >
+      <div class="flex h-20 items-center gap-3 border-b border-blue-50 px-6">
+        <img
+          src="/images/logo.png"
+          alt="Logo DigiSejahtera"
+          class="h-12 w-12 object-contain drop-shadow-sm"
+        />
 
-                <!-- User Dropdown for Desktop -->
-                <div class="ds-nav__user-dropdown">
-                    <Dropdown align="right" width="48">
-                        <template #trigger>
-                            <div class="ds-nav__user-button">
-                                <span>{{ $page.props.auth.user.name }}</span>
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                                    <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2a6.5 6.5 0 0 0-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4 3 5.5M5 16a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-2a2 2 0 0 0-2-2" />
-                                </svg>
-                            </div>
-                        </template>
+        <div>
+          <p class="text-xl font-black tracking-tight">
+            <span class="text-[#1a6fbd]">Digi</span>
+            <span class="text-[#3aab2e]">Sejahtera</span>
+          </p>
 
-                        <template #content>
-                            <DropdownLink :href="route('profile.edit') " :active="route().current('profile.edit')">
-                                Profile
-                            </DropdownLink>
-                            <DropdownLink :href="route('logout')" method="post" as="button">
-                                Keluar
-                            </DropdownLink>
-                        </template>
-                    </Dropdown>
-                </div>
-
-                <!-- Hamburger -->
-                <div class="ds-nav__hamburger-wrapper">
-                    <button
-                        @click="showingNavigationDropdown = !showingNavigationDropdown"
-                        class="ds-nav__hamburger"
-                    >
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path :class="{ hidden: showingNavigationDropdown, 'inline-flex': !showingNavigationDropdown }" d="M4 6h16M4 12h16M4 18h16" />
-                            <path :class="{ hidden: !showingNavigationDropdown, 'inline-flex': showingNavigationDropdown }" d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                    </button>
-                </div>
-            </div>
-        </nav>
-
-        <!-- Responsive Navigation Menu -->
-        <div :class="{ 'ds-nav__responsive--open': showingNavigationDropdown }" class="ds-nav__responsive sm:hidden">
-            <div class="ds-nav__responsive-content">
-                <ResponsiveNavLink :href="route('dashboard')" :active="route().current('dashboard')">
-                    Dashboard
-                </ResponsiveNavLink>
-
-                <!-- Responsive Settings Options -->
-                <div class="ds-nav__responsive-settings">
-                    <div class="ds-nav__responsive-user">
-                        <div class="ds-nav__responsive-user-name">{{ $page.props.auth.user.name }}</div>
-                        <div class="ds-nav__responsive-user-email">{{ $page.props.auth.user.email }}</div>
-                    </div>
-
-                    <div class="ds-nav__responsive-menu">
-                        <ResponsiveNavLink :href="route('profile.edit')" :active="route().current('profile.edit')">
-                            Profile
-                        </ResponsiveNavLink>
-                        <ResponsiveNavLink :href="route('logout')" method="post" as="button">
-                            Keluar
-                        </ResponsiveNavLink>
-                    </div>
-                </div>
-            </div>
+          <p class="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-400">
+            Koperasi Digital
+          </p>
         </div>
+      </div>
 
-        <div class="min-h-screen bg-gray-100" style="padding-top: 72px;">
-            <!-- Page Heading -->
-            <header
-                class="bg-white shadow"
-                v-if="$slots.header"
+      <nav class="flex-1 space-y-1 overflow-y-auto px-4 py-6">
+        <p class="mb-3 px-3 text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400">
+          Menu Utama
+        </p>
+
+        <Link
+          v-for="menu in visibleMenus"
+          :key="menu.href"
+          :href="menu.href"
+          class="group flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold transition duration-200"
+          :class="
+            isActive(menu.href)
+              ? 'bg-gradient-to-r from-[#1a6fbd] to-[#0f4f8e] text-white shadow-lg shadow-blue-200'
+              : 'text-slate-500 hover:bg-blue-50 hover:text-[#1a6fbd]'
+          "
+          @click="sidebarOpen = false"
+        >
+          <!-- Dashboard -->
+          <svg
+            v-if="menu.icon === 'dashboard'"
+            class="h-5 w-5"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <rect x="3" y="3" width="7" height="7" rx="1" />
+            <rect x="14" y="3" width="7" height="7" rx="1" />
+            <rect x="3" y="14" width="7" height="7" rx="1" />
+            <rect x="14" y="14" width="7" height="7" rx="1" />
+          </svg>
+
+          <!-- Card -->
+          <svg
+            v-else-if="menu.icon === 'card'"
+            class="h-5 w-5"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <rect x="3" y="5" width="18" height="14" rx="2" />
+            <path d="M3 10h18" />
+          </svg>
+
+          <!-- Users -->
+          <svg
+            v-else-if="menu.icon === 'users'"
+            class="h-5 w-5"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+            <circle cx="9" cy="7" r="4" />
+            <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+            <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+          </svg>
+
+          <!-- Report -->
+          <svg
+            v-else
+            class="h-5 w-5"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+          </svg>
+
+          <span>{{ menu.label }}</span>
+        </Link>
+      </nav>
+
+      <div class="border-t border-blue-50 p-4">
+        <div class="rounded-2xl bg-gradient-to-br from-blue-50 to-green-50 p-4">
+          <p class="text-sm font-bold text-slate-700">
+            {{ user?.name }}
+          </p>
+
+          <p class="mt-0.5 text-xs capitalize text-slate-500">
+            {{ user?.role }}
+          </p>
+
+          <Link
+            :href="route('profile.edit')"
+            class="mt-4 flex w-full items-center justify-center gap-2 rounded-xl border border-blue-100 bg-white px-3 py-2 text-xs font-bold text-[#1a6fbd] transition hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-sm"
+          >
+            Lihat Profil
+          </Link>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main content -->
+    <div class="lg:pl-72">
+      <header class="sticky top-0 z-20 border-b border-blue-100 bg-white/80 backdrop-blur-xl">
+        <div class="flex h-20 items-center justify-between px-5 sm:px-8">
+          <div class="flex items-center gap-3">
+            <button
+              type="button"
+              class="rounded-xl border border-blue-100 bg-white p-2 text-[#1a6fbd] shadow-sm lg:hidden"
+              aria-label="Buka sidebar"
+              @click="sidebarOpen = true"
             >
-                <div class="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-                    <slot name="header" />
+              <svg
+                class="h-5 w-5"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+
+            <div>
+              <p class="text-xs font-bold uppercase tracking-[0.18em] text-[#3aab2e]">
+                DigiSejahtera
+              </p>
+
+              <h1 class="text-lg font-black tracking-tight text-slate-800">
+                <slot name="title" />
+              </h1>
+            </div>
+          </div>
+
+          <!-- Navbar profile dropdown -->
+          <div
+            class="relative"
+            data-profile-menu
+          >
+            <button
+              type="button"
+              class="flex items-center gap-3 rounded-2xl px-2 py-2 transition hover:bg-blue-50"
+              @click.stop="profileMenuOpen = !profileMenuOpen"
+            >
+              <div class="hidden text-right sm:block">
+                <p class="text-sm font-bold text-slate-700">
+                  {{ user?.name }}
+                </p>
+
+                <p class="text-xs capitalize text-slate-400">
+                  {{ user?.role }}
+                </p>
+              </div>
+
+              <div class="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-[#1a6fbd] to-[#3aab2e] text-sm font-black text-white shadow-md shadow-blue-200">
+                {{ user?.name?.charAt(0)?.toUpperCase() }}
+              </div>
+
+              <svg
+                class="h-4 w-4 text-slate-400 transition"
+                :class="profileMenuOpen ? 'rotate-180' : ''"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="m6 9 6 6 6-6" />
+              </svg>
+            </button>
+
+            <Transition
+              enter-active-class="transition duration-150 ease-out"
+              leave-active-class="transition duration-100 ease-in"
+              enter-from-class="-translate-y-2 opacity-0"
+              leave-to-class="-translate-y-2 opacity-0"
+            >
+              <div
+                v-if="profileMenuOpen"
+                class="absolute right-0 mt-2 w-56 overflow-hidden rounded-2xl border border-blue-100 bg-white p-2 shadow-xl shadow-blue-100/70"
+              >
+                <div class="border-b border-blue-50 px-3 py-3">
+                  <p class="truncate text-sm font-bold text-slate-700">
+                    {{ user?.name }}
+                  </p>
+
+                  <p class="truncate text-xs text-slate-400">
+                    @{{ user?.username }}
+                  </p>
                 </div>
-            </header>
 
-            <!-- Page Content -->
-            <main class="ds-main-content" :class="{ 'ds-main-content--responsive-open': showingNavigationDropdown && windowWidth < 768 }" @click="showingNavigationDropdown = false">
-                <slot />
-            </main>
+                <Link
+                  :href="route('profile.edit')"
+                  class="mt-1 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-500 transition hover:bg-blue-50 hover:text-[#1a6fbd]"
+                  @click="profileMenuOpen = false"
+                >
+                  <svg
+                    class="h-4 w-4"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <circle cx="12" cy="8" r="4" />
+                    <path d="M4 21a8 8 0 0 1 16 0" />
+                  </svg>
+
+                  Profil Saya
+                </Link>
+
+                <Link
+                  :href="route('logout')"
+                  method="post"
+                  as="button"
+                  class="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-semibold text-red-500 transition hover:bg-red-50"
+                >
+                  <svg
+                    class="h-4 w-4"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path d="M10 17l5-5-5-5" />
+                    <path d="M15 12H3" />
+                    <path d="M21 19V5a2 2 0 0 0-2-2h-6" />
+                  </svg>
+
+                  Keluar
+                </Link>
+              </div>
+            </Transition>
+          </div>
         </div>
+      </header>
+
+      <main class="px-5 py-7 sm:px-8">
+        <slot />
+      </main>
     </div>
+  </div>
 </template>
-
-<style scoped>
-/* ═══ CSS VARIABLES ═══ */
-.authenticated-layout {
-  --blue: #1a6fbd;
-  --blue-dark: #0f4f8e;
-  --blue-light: #3d8fd4;
-  --green: #3aab2e;
-  --green-dark: #268c1a;
-  --green-light: #5cc94f;
-  --orange: #f07c1a;
-  --orange-light: #f9a54a;
-  --teal: #17a087;
-  --white: #ffffff;
-  --off-white: #f4f8ff;
-  --gray-100: #eef2f9;
-  --gray-200: #dde4f0;
-  --gray-500: #7a8aad;
-  --gray-700: #3a4a6b;
-  --gray-900: #14213d;
-  --shadow-sm: 0 2px 8px rgba(26, 111, 189, 0.10);
-  --shadow-md: 0 6px 24px rgba(26, 111, 189, 0.14);
-  --shadow-lg: 0 16px 48px rgba(26, 111, 189, 0.18);
-  --radius: 16px;
-  --radius-sm: 8px;
-  --radius-lg: 24px;
-}
-
-/* ═══ NAV ═══ */
-.ds-nav {
-  position: fixed;
-  top: 0; left: 0; right: 0;
-  z-index: 100;
-  transition: all 0.3s ease;
-  padding: 0 24px;
-  background: var(--white);
-}
-
-.ds-nav__inner {
-  max-width: 1200px;
-  margin: 0 auto;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  height: 72px;
-}
-
-.ds-nav--scrolled {
-  background: rgba(255,255,255,0.95);
-  backdrop-filter: blur(16px);
-  box-shadow: var(--shadow-sm);
-}
-
-.ds-nav__brand {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  text-decoration: none;
-  cursor: pointer;
-}
-
-.ds-nav__logo-wrap {
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.ds-nav__logo-img {
-  width: 40px;
-  height: 40px;
-  object-fit: contain;
-}
-
-.ds-nav__brand-text {
-  font-size: 1.4rem;
-  font-weight: 800;
-  letter-spacing: -0.5px;
-  text-decoration: none;
-  color: inherit;
-  display: flex;
-  gap: 0;
-}
-
-.ds-brand-digi { color: var(--blue); }
-.ds-brand-sejahtera { color: var(--green); }
-
-/* Desktop Navigation */
-.ds-nav__desktop-menu {
-  display: none;
-  align-items: center;
-  gap: 8px;
-  flex: 1;
-  margin-left: 32px;
-}
-
-@media (min-width: 640px) {
-  .ds-nav__desktop-menu {
-    display: flex;
-  }
-}
-
-/* User Dropdown Button */
-.ds-nav__user-dropdown {
-  display: none;
-}
-
-@media (min-width: 640px) {
-  .ds-nav__user-dropdown {
-    display: flex;
-    align-items: center;
-  }
-}
-
-.ds-nav__user-button {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: linear-gradient(135deg, var(--blue), var(--blue-dark));
-  color: white;
-  text-decoration: none;
-  padding: 10px 22px;
-  border-radius: 50px;
-  font-weight: 700;
-  font-size: 0.95rem;
-  transition: all 0.22s ease;
-  box-shadow: 0 4px 14px rgba(26,111,189,0.3);
-  cursor: pointer;
-  border: none;
-}
-
-.ds-nav__user-button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(26,111,189,0.4);
-  background: linear-gradient(135deg, var(--blue-dark), #0a3d70);
-}
-
-/* Hamburger */
-.ds-nav__hamburger-wrapper {
-  display: flex;
-  align-items: center;
-}
-
-@media (min-width: 640px) {
-  .ds-nav__hamburger-wrapper {
-    display: none;
-  }
-}
-
-.ds-nav__hamburger {
-  background: none;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 8px;
-  color: var(--gray-700);
-  transition: all 0.2s ease;
-}
-
-.ds-nav__hamburger:hover {
-  color: var(--blue);
-}
-
-/* Responsive Menu */
-.ds-nav__responsive {
-  position: fixed;
-  top: 72px;
-  left: 0;
-  right: 0;
-  z-index: 99;
-  background: white;
-  border-bottom: 1px solid var(--gray-200);
-  box-shadow: var(--shadow-md);
-  transition: all 0.3s ease;
-  max-height: 0;
-  overflow: hidden;
-  visibility: hidden;
-}
-
-.ds-nav__responsive--open {
-  max-height: calc(100vh - 72px);
-  visibility: visible;
-  overflow-y: auto;
-  animation: slideDown 0.3s ease;
-}
-
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.ds-nav__responsive-content {
-  padding: 12px 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-}
-
-.ds-nav__responsive-settings {
-  border-top: 2px solid var(--gray-200);
-  padding: 16px 0;
-  margin: 12px 0 0 0;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.ds-nav__responsive-user {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding: 0 8px;
-}
-
-.ds-nav__responsive-user-name {
-  font-size: 0.95rem;
-  font-weight: 700;
-  color: var(--gray-900);
-}
-
-.ds-nav__responsive-user-email {
-  font-size: 0.8rem;
-  color: var(--gray-500);
-}
-
-.ds-nav__responsive-menu {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding: 0;
-}
-
-.ds-main-content {
-  position: relative;
-  z-index: 1;
-  width: 100%;
-  transition: all 0.3s ease;
-}
-
-.ds-main-content--responsive-open {
-  padding-top: 180px;
-}
-
-/* Fix dropdown positioning to stay below navbar */
-:deep(.dropdown) {
-  z-index: 98;
-}
-
-:deep(.dropdown-content) {
-  z-index: 98;
-  position: absolute;
-  top: 100%;
-  margin-top: 4px;
-}
-
-/* ═══ ANIMATIONS ═══ */
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(24px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes fadeInRight {
-  from { opacity: 0; transform: translateX(40px); }
-  to { opacity: 1; transform: translateX(0); }
-}
-
-/* ═══ RESPONSIVE ═══ */
-@media (max-width: 768px) {
-  .ds-nav__inner {
-    padding: 0;
-  }
-
-  .ds-nav {
-    padding: 0 16px;
-  }
-}
-</style>
