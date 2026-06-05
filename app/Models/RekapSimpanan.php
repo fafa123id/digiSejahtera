@@ -10,6 +10,8 @@ class RekapSimpanan extends Model
 {
     use HasFactory;
 
+    protected $table = 'rekap_simpanans';
+
     protected $fillable = [
         'anggota_id',
         'total_simpanan_pokok',
@@ -19,7 +21,7 @@ class RekapSimpanan extends Model
         'total_simpanan_rekreasi',
         'total_simpanan',
     ];
-
+    
     protected function casts(): array
     {
         return [

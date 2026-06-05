@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Anggota extends Model
 {
     use HasFactory, SoftDeletes;
-
+    protected $table = 'anggotas';
     public const STATUS_AKTIF = 'aktif';
     public const STATUS_NONAKTIF = 'nonaktif';
 
