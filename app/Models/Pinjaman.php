@@ -18,6 +18,7 @@ class Pinjaman extends Model
     public const STATUS_AKTIF = 'aktif';
     public const STATUS_LUNAS = 'lunas';
 
+    protected $table = 'pinjamans';
     protected $fillable = [
         'anggota_id',
         'tanggal_pinjaman',

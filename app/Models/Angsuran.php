@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Angsuran extends Model
 {
     use HasFactory;
-
+    protected $table = 'angsurans';
     protected $fillable = [
         'pinjaman_id',
         'periode',
@@ -38,7 +38,12 @@ class Angsuran extends Model
             'jumlah_tagihan' => 'decimal:2',
         ];
     }
-
+    public function anggota(): BelongsTo
+    {
+        return $this->belongsTo(
+            Anggota::class
+        );
+    }
     public function pinjaman(): BelongsTo
     {
         return $this->belongsTo(Pinjaman::class);
