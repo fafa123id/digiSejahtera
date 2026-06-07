@@ -44,7 +44,7 @@ WORKDIR /var/www/digisejahtera
 # =========================
 # Stage 1: Composer dependencies
 # =========================
-FROM composer:2.8.10 AS composer_deps
+FROM php_base AS composer_deps
 
 WORKDIR /app
 
