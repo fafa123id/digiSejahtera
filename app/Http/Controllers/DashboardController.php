@@ -37,10 +37,6 @@ class DashboardController extends Controller
         ]);
     }
 
-    /**
-     * Mengambil angka ringkasan yang ditampilkan
-     * pada empat kartu dashboard.
-     */
     private function getSummary(): array
     {
         $awalBulan = now()->startOfMonth();
@@ -93,14 +89,6 @@ class DashboardController extends Controller
         ];
     }
 
-    /**
-     * Mengambil tren transaksi selama 12 bulan.
-     *
-     * Grafik menampilkan:
-     * - jumlah simpanan bersih pada bulan terkait;
-     * - nominal pinjaman baru;
-     * - pembayaran angsuran pokok.
-     */
     private function getMonthlyTrend(
         \DateTimeInterface $awalPeriode
     ): array {
@@ -240,9 +228,7 @@ class DashboardController extends Controller
             ->all();
     }
 
-    /**
-     * Mengambil komposisi sisa pinjaman aktif.
-     */
+
     private function getLoanComposition(): array
     {
         $composition = Pinjaman::query()
@@ -278,10 +264,7 @@ class DashboardController extends Controller
         ];
     }
 
-    /**
-     * Menggabungkan aktivitas simpanan, pinjaman,
-     * dan angsuran terbaru ke dalam satu daftar.
-     */
+
     private function getRecentTransactions(): array
     {
         $simpanans = Simpanan::query()
