@@ -17,6 +17,22 @@ pipeline {
                 }
             }
         }
+    stage('Prepare XLSX Templates') {
+        steps {
+            withCredentials([
+                file(
+                    credentialsId: 'kartu-rekening',
+                    variable: 'REKENING_XLSX_FILE'
+                )
+            ]) {
+                sh '''
+                    rm -rf .docker-secrets
+                    mkdir -p .docker-secrets/templates/xlsx
+                    cp "$REKENING_XLSX_FILE" ".docker-secrets/templates/xlsx/template.xlsx"
+                '''
+            }
+        }
+    }
 
         stage('Build and Deploy Application') {
             steps {
