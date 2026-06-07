@@ -116,9 +116,7 @@ class PengurusController extends Controller
         );
     }
 
-    /**
-     * Menghasilkan password sementara baru.
-     */
+
     public function resetPassword(
         User $pengurus
     ): RedirectResponse {
@@ -144,9 +142,7 @@ class PengurusController extends Controller
         ]);
     }
 
-    /**
-     * Memastikan akun yang diproses benar-benar merupakan pengurus.
-     */
+
     private function ensurePengurus(User $pengurus): void
     {
         abort_unless(
@@ -155,9 +151,7 @@ class PengurusController extends Controller
         );
     }
 
-    /**
-     * Menghasilkan password sementara.
-     */
+
     private function generateTemporaryPassword(): string
     {
         return Str::password(
@@ -168,12 +162,6 @@ class PengurusController extends Controller
         );
     }
 
-    /**
-     * Membuat flash toast dengan ID unik.
-     *
-     * ID diperlukan agar Vue menjalankan ulang animasi toast meskipun
-     * pesan dari aksi sebelumnya memiliki teks yang sama.
-     */
     private function makeToast(
         string $message,
         string $type = 'success'

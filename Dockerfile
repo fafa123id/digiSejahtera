@@ -8,6 +8,8 @@ RUN set -eux; \
   apt-get install -y --no-install-recommends \
   libpng-dev \
   libjpeg-dev \
+  libzip-dev \
+  zlib1g-dev \
   libfreetype6-dev \
   libpq-dev \
   libonig-dev \
@@ -30,6 +32,7 @@ RUN set -eux; \
   pcntl \
   bcmath \
   gd \
+  zip \
   pdo_mysql \
   pdo_pgsql \
   pgsql \
@@ -44,7 +47,7 @@ WORKDIR /var/www/digisejahtera
 # =========================
 # Stage 1: Composer dependencies
 # =========================
-FROM composer:2.8.10 AS composer_deps
+FROM php_base AS composer_deps
 
 WORKDIR /app
 
@@ -88,7 +91,7 @@ RUN echo "${GIT_HASH}" > .version
 COPY . .
 COPY --from=composer_deps /app/vendor ./vendor
 COPY --from=vite_build /var/www/digisejahtera/public/build ./public/build
-
+COPY --chown=www-data:www-data .docker-secrets/templates/xlsx/template.xlsx ./storage/app/templates/template.xlsx
 RUN composer dump-autoload \
   --no-dev \
   --optimize \
