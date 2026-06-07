@@ -21,7 +21,7 @@ pipeline {
         steps {
             withCredentials([
                 file(
-                    credentialsId: 'kartu-rekening',
+                    credentialsId: 'kartu-rekening-digisejahtera',
                     variable: 'REKENING_XLSX_FILE'
                 )
             ]) {
