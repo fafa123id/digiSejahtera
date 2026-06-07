@@ -22,6 +22,7 @@ services:
     volumes:
       - app_storage:/var/www/digisejahtera/storage
       - laravel_cache:/var/www/digisejahtera/bootstrap/cache
+      - ./php.ini:/usr/local/etc/php/conf.d/custom.ini:ro
     networks:
       - shared-network
 
