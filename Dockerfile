@@ -27,6 +27,8 @@ RUN set -eux; \
   docker-php-ext-install -j"$(nproc)" \
   mbstring \
   exif \
+  libzip-dev \
+  zlib1g-dev \
   pcntl \
   bcmath \
   gd \
