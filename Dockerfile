@@ -30,6 +30,7 @@ RUN set -eux; \
   pcntl \
   bcmath \
   gd \
+  zip \
   pdo_mysql \
   pdo_pgsql \
   pgsql \
