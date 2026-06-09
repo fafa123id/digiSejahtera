@@ -29,3 +29,4 @@ Route::middleware('auth')->group(function () {
 require __DIR__ . '/auth.php';
 require __DIR__ . '/pengurus.php';
 require __DIR__ . '/karturekening.php';
+require __DIR__ . '/kitir.php';
