@@ -13,19 +13,19 @@ class AnggotaService
         return DB::transaction(function () use ($data): Anggota {
             return Anggota::create([
                 'nomor_anggota' =>
-                    $this->buatNomorAnggotaBerikutnya(),
+                $this->buatNomorAnggotaBerikutnya(),
 
                 'nama' =>
-                    $data['nama'],
-
+                $data['nama'],
+                'agama' => $data['agama'],
                 'tanggal_masuk' =>
-                    $data['tanggal_masuk'],
+                $data['tanggal_masuk'],
 
                 'tanggal_keluar' =>
-                    null,
+                null,
 
                 'status' =>
-                    Anggota::STATUS_AKTIF,
+                Anggota::STATUS_AKTIF,
             ]);
         });
     }
@@ -46,10 +46,10 @@ class AnggotaService
     ): Anggota {
         $anggota->update([
             'status' =>
-                Anggota::STATUS_NONAKTIF,
+            Anggota::STATUS_NONAKTIF,
 
             'tanggal_keluar' =>
-                now()->toDateString(),
+            now()->toDateString(),
         ]);
 
         return $anggota;
@@ -65,7 +65,7 @@ class AnggotaService
         ) {
             throw ValidationException::withMessages([
                 'anggota' =>
-                    'Data anggota tidak dapat dihapus karena memiliki riwayat transaksi. Gunakan tombol keluarkan anggota.',
+                'Data anggota tidak dapat dihapus karena memiliki riwayat transaksi. Gunakan tombol keluarkan anggota.',
             ]);
         }
 
@@ -77,8 +77,8 @@ class AnggotaService
         $nomorTerakhir = Anggota::withTrashed()
             ->pluck('nomor_anggota')
             ->map(
-                fn (string $nomor): int =>
-                    (int) $nomor
+                fn(string $nomor): int =>
+                (int) $nomor
             )
             ->max() ?? 0;
 

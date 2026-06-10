@@ -16,8 +16,7 @@ class KartuRekeningInlineService
         private readonly RekapSimpananService $rekapSimpananService,
         private readonly PinjamanCalculationService $pinjamanCalculationService,
         private readonly ShuService $shuService
-    ) {
-    }
+    ) {}
 
     public function simpan(
         array $changes,
@@ -39,37 +38,27 @@ class KartuRekeningInlineService
                 $affectedLoanAccounts =
                     [];
 
-                $this->simpanNama(
-                    changes:
-                        $collection,
-
-                    affectedAnggotaIds:
-                        $affectedAnggotaIds,
+                $this->simpanAnggota(
+                    changes: $collection,
+                    affectedAnggotaIds: $affectedAnggotaIds,
                 );
 
                 $this->simpanSimpanan(
-                    changes:
-                        $collection,
+                    changes: $collection,
 
-                    userId:
-                        $userId,
+                    userId: $userId,
 
-                    affectedAnggotaIds:
-                        $affectedAnggotaIds,
+                    affectedAnggotaIds: $affectedAnggotaIds,
                 );
 
                 $this->simpanTransaksiPinjaman(
-                    changes:
-                        $collection,
+                    changes: $collection,
 
-                    userId:
-                        $userId,
+                    userId: $userId,
 
-                    affectedAnggotaIds:
-                        $affectedAnggotaIds,
+                    affectedAnggotaIds: $affectedAnggotaIds,
 
-                    affectedLoanAccounts:
-                        $affectedLoanAccounts,
+                    affectedLoanAccounts: $affectedLoanAccounts,
                 );
 
                 foreach (
@@ -79,11 +68,9 @@ class KartuRekeningInlineService
                     $this
                         ->pinjamanCalculationService
                         ->hitungJasaDanSisaPinjaman(
-                            anggotaId:
-                                $account['anggota_id'],
+                            anggotaId: $account['anggota_id'],
 
-                            jenisPinjaman:
-                                $account['jenis'],
+                            jenisPinjaman: $account['jenis'],
                         );
                 }
 
@@ -114,37 +101,27 @@ class KartuRekeningInlineService
         );
     }
 
-    private function simpanNama(
-        Collection $changes,
-        array &$affectedAnggotaIds
-    ): void {
+    private function simpanAnggota(Collection $changes, array &$affectedAnggotaIds): void
+    {
         $changes
-            ->where(
-                'section',
-                'anggota'
-            )
-            ->each(
-                function (
-                    array $change
-                ) use (
-                    &$affectedAnggotaIds
-                ): void {
-                    $anggota = Anggota::query()
-                        ->findOrFail(
-                            $change['anggota_id']
-                        );
+            ->where('section', 'anggota')
+            ->each(function (array $change) use (&$affectedAnggotaIds): void {
+                $anggota = Anggota::query()->findOrFail($change['anggota_id']);
 
+                if ($change['field'] === 'nama') {
                     $anggota->update([
-                        'nama' =>
-                            trim(
-                                (string) $change['value']
-                            ),
+                        'nama' => trim((string) $change['value']),
                     ]);
-
-                    $affectedAnggotaIds[] =
-                        $anggota->id;
                 }
-            );
+
+                if ($change['field'] === 'agama') {
+                    $anggota->update([
+                        'agama' => $change['value'],
+                    ]);
+                }
+
+                $affectedAnggotaIds[] = $anggota->id;
+            });
     }
 
     private function simpanSimpanan(
@@ -158,10 +135,10 @@ class KartuRekeningInlineService
                 'simpanan'
             )
             ->groupBy(
-                fn (array $change): string =>
-                    $change['anggota_id']
-                    .'|'
-                    .$change['periode']
+                fn(array $change): string =>
+                $change['anggota_id']
+                    . '|'
+                    . $change['periode']
             )
             ->each(
                 function (
@@ -186,20 +163,15 @@ class KartuRekeningInlineService
                     $this
                         ->transactionService
                         ->submitSimpanan(
-                            anggota:
-                                $anggota,
+                            anggota: $anggota,
 
-                            periode:
-                                $periode,
+                            periode: $periode,
 
-                            changes:
-                                $group,
+                            changes: $group,
 
-                            userId:
-                                $userId,
+                            userId: $userId,
 
-                            hitungUlang:
-                                false,
+                            hitungUlang: false,
                         );
 
                     $affectedAnggotaIds[] =
@@ -216,21 +188,21 @@ class KartuRekeningInlineService
     ): void {
         $changes
             ->filter(
-                fn (array $change): bool =>
-                    in_array(
-                        $change['section'],
-                        [
-                            Pinjaman::JENIS_REGULER,
-                            Pinjaman::JENIS_SEBRAK,
-                        ],
-                        true
-                    )
+                fn(array $change): bool =>
+                in_array(
+                    $change['section'],
+                    [
+                        Pinjaman::JENIS_REGULER,
+                        Pinjaman::JENIS_SEBRAK,
+                    ],
+                    true
+                )
             )
             ->sortBy(
-                fn (array $change): string =>
-                    $change['periode']
-                    .'|'
-                    .$this->urutanPerubahan(
+                fn(array $change): string =>
+                $change['periode']
+                    . '|'
+                    . $this->urutanPerubahan(
                         $change
                     )
             )
@@ -259,83 +231,65 @@ class KartuRekeningInlineService
                         $change['value']
                         ?? null;
 
-                    $berubah = match (
-                        $change['action']
-                    ) {
+                    $berubah = match ($change['action']) {
                         'create_pinjaman',
                         'update_pinjaman' =>
-                            $this
-                                ->transactionService
-                                ->submitPinjaman(
-                                    anggota:
-                                        $anggota,
+                        $this
+                            ->transactionService
+                            ->submitPinjaman(
+                                anggota: $anggota,
 
-                                    jenis:
-                                        $jenis,
+                                jenis: $jenis,
 
-                                    periode:
-                                        $periode,
+                                periode: $periode,
 
-                                    action:
-                                        $change['action'],
+                                action: $change['action'],
 
-                                    rawValue:
-                                        $rawValue,
+                                rawValue: $rawValue,
 
-                                    pinjamanId:
-                                        isset(
-                                            $change['entry_id']
-                                        )
-                                            ? (int) $change['entry_id']
-                                            : null,
+                                pinjamanId: isset(
+                                    $change['entry_id']
+                                )
+                                    ? (int) $change['entry_id']
+                                    : null,
 
-                                    userId:
-                                        $userId,
+                                userId: $userId,
 
-                                    hitungUlang:
-                                        false,
-                                ),
+                                hitungUlang: false,
+                            ),
 
                         'create_angsuran',
                         'update_angsuran' =>
-                            $this
-                                ->transactionService
-                                ->submitAngsuran(
-                                    anggota:
-                                        $anggota,
+                        $this
+                            ->transactionService
+                            ->submitAngsuran(
+                                anggota: $anggota,
 
-                                    jenis:
-                                        $jenis,
+                                jenis: $jenis,
 
-                                    periode:
-                                        $periode,
+                                periode: $periode,
 
-                                    action:
-                                        $change['action'],
+                                action: $change['action'],
 
-                                    rawValue:
-                                        $rawValue,
+                                rawValue: $rawValue,
 
-                                    angsuranId:
-                                        isset(
-                                            $change['entry_id']
-                                        )
-                                            ? (int) $change['entry_id']
-                                            : null,
+                                angsuranId: isset(
+                                    $change['entry_id']
+                                )
+                                    ? (int) $change['entry_id']
+                                    : null,
 
-                                    userId:
-                                        $userId,
+                                userId: $userId,
 
-                                    hitungUlang:
-                                        false,
-                                ),
+                                hitungUlang: false,
+                            ),
 
                         default =>
-                            throw ValidationException
-                                ::withMessages([
-                                    'pinjaman' =>
-                                        'Jenis perubahan transaksi tidak valid.',
-                                ]),
+                        throw ValidationException
+                            ::withMessages([
+                                'pinjaman' =>
+                                'Jenis perubahan transaksi tidak valid.',
+                            ]),
                     };
 
                     if (!$berubah) {
@@ -347,17 +301,15 @@ class KartuRekeningInlineService
 
                     $accountKey =
                         $anggota->id
-                        .'|'
-                        .$jenis;
+                        . '|'
+                        . $jenis;
 
-                    $affectedLoanAccounts[
-                        $accountKey
-                    ] = [
+                    $affectedLoanAccounts[$accountKey] = [
                         'anggota_id' =>
-                            $anggota->id,
+                        $anggota->id,
 
                         'jenis' =>
-                            $jenis,
+                        $jenis,
                     ];
                 }
             );

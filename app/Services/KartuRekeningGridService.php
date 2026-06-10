@@ -15,49 +15,49 @@ class KartuRekeningGridService
         return Anggota::query()
             ->with([
                 'simpanans' =>
-                    fn ($query) =>
-                        $query
-                            ->whereYear(
-                                'periode',
-                                $tahun
-                            )
-                            ->orderBy(
-                                'periode'
-                            ),
+                fn($query) =>
+                $query
+                    ->whereYear(
+                        'periode',
+                        $tahun
+                    )
+                    ->orderBy(
+                        'periode'
+                    ),
 
                 'rekapSimpanan',
 
                 'pinjamans' =>
-                    fn ($query) =>
+                fn($query) =>
+                $query
+                    ->with([
+                        'angsurans' =>
+                        fn($query) =>
                         $query
-                            ->with([
-                                'angsurans' =>
-                                    fn ($query) =>
-                                        $query
-                                            ->orderBy(
-                                                'periode'
-                                            )
-                                            ->orderBy(
-                                                'id'
-                                            ),
-                            ])
                             ->orderBy(
-                                'tanggal_pinjaman'
+                                'periode'
                             )
                             ->orderBy(
                                 'id'
                             ),
+                    ])
+                    ->orderBy(
+                        'tanggal_pinjaman'
+                    )
+                    ->orderBy(
+                        'id'
+                    ),
             ])
             ->orderBy(
                 'nomor_anggota'
             )
             ->get()
             ->map(
-                fn (Anggota $anggota): array =>
-                    $this->buatDataAnggota(
-                        anggota: $anggota,
-                        tahun: $tahun,
-                    )
+                fn(Anggota $anggota): array =>
+                $this->buatDataAnggota(
+                    anggota: $anggota,
+                    tahun: $tahun,
+                )
             )
             ->values()
             ->all();
@@ -80,16 +80,14 @@ class KartuRekeningGridService
         $this->isiJenisPinjaman(
             anggota: $anggota,
             tahun: $tahun,
-            jenis:
-                Pinjaman::JENIS_REGULER,
+            jenis: Pinjaman::JENIS_REGULER,
             rows: $rows,
         );
 
         $this->isiJenisPinjaman(
             anggota: $anggota,
             tahun: $tahun,
-            jenis:
-                Pinjaman::JENIS_SEBRAK,
+            jenis: Pinjaman::JENIS_SEBRAK,
             rows: $rows,
         );
 
@@ -98,36 +96,25 @@ class KartuRekeningGridService
                 function (
                     array $row
                 ): array {
-                    $row['simpanan']
-                        ['jumlah_simpanan'] =
-                            array_sum([
-                                $row['simpanan']
-                                    ['simpanan_pokok'],
+                    $row['simpanan']['jumlah_simpanan'] =
+                        array_sum([
+                            $row['simpanan']['simpanan_pokok'],
 
-                                $row['simpanan']
-                                    ['simpanan_wajib'],
+                            $row['simpanan']['simpanan_wajib'],
 
-                                $row['simpanan']
-                                    ['simpanan_sukarela'],
+                            $row['simpanan']['simpanan_sukarela'],
 
-                                $row['simpanan']
-                                    ['simpanan_hari_raya'],
+                            $row['simpanan']['simpanan_hari_raya'],
 
-                                $row['simpanan']
-                                    ['simpanan_rekreasi'],
-                            ]);
+                            $row['simpanan']['simpanan_rekreasi'],
+                        ]);
 
                     $row['jumlah_tagihan'] =
-                        $row['simpanan']
-                            ['jumlah_simpanan']
-                        + $row['reguler']
-                            ['jumlah_angsuran']
-                        + $row['reguler']
-                            ['jasa']
-                        + $row['sebrak']
-                            ['jumlah_angsuran']
-                        + $row['sebrak']
-                            ['jasa'];
+                        $row['simpanan']['jumlah_simpanan']
+                        + $row['reguler']['jumlah_angsuran']
+                        + $row['reguler']['jasa']
+                        + $row['sebrak']['jumlah_angsuran']
+                        + $row['sebrak']['jasa'];
 
                     return $row;
                 }
@@ -135,97 +122,96 @@ class KartuRekeningGridService
 
         $rekap =
             $anggota
-                ->rekapSimpanan;
+            ->rekapSimpanan;
 
         return [
             'id' =>
-                $anggota->id,
+            $anggota->id,
 
             'nomor_anggota' =>
-                $anggota
-                    ->nomor_anggota,
+            $anggota
+                ->nomor_anggota,
 
             'nama' =>
-                $anggota
-                    ->nama,
+            $anggota
+                ->nama,
+            'agama' => $anggota->agama,
 
             'tanggal_masuk' =>
-                $anggota
-                    ->tanggal_masuk
-                    ?->format('Y-m-d'),
+            $anggota
+                ->tanggal_masuk
+                ?->format('Y-m-d'),
 
             'tanggal_keluar' =>
-                $anggota
-                    ->tanggal_keluar
-                    ?->format('Y-m-d'),
+            $anggota
+                ->tanggal_keluar
+                ?->format('Y-m-d'),
 
             'status' =>
-                $anggota
-                    ->status,
+            $anggota
+                ->status,
 
             'rows' =>
-                $rows
-                    ->values()
-                    ->all(),
+            $rows
+                ->values()
+                ->all(),
 
             'totals' => [
                 'simpanan_pokok' =>
-                    (float) (
-                        $rekap
-                            ?->total_simpanan_pokok
-                        ?? 0
-                    ),
+                (float) (
+                    $rekap
+                    ?->total_simpanan_pokok
+                    ?? 0
+                ),
 
                 'simpanan_wajib' =>
-                    (float) (
-                        $rekap
-                            ?->total_simpanan_wajib
-                        ?? 0
-                    ),
+                (float) (
+                    $rekap
+                    ?->total_simpanan_wajib
+                    ?? 0
+                ),
 
                 'simpanan_sukarela' =>
-                    (float) (
-                        $rekap
-                            ?->total_simpanan_sukarela
-                        ?? 0
-                    ),
+                (float) (
+                    $rekap
+                    ?->total_simpanan_sukarela
+                    ?? 0
+                ),
 
                 'simpanan_hari_raya' =>
-                    (float) (
-                        $rekap
-                            ?->total_simpanan_hari_raya
-                        ?? 0
-                    ),
+                (float) (
+                    $rekap
+                    ?->total_simpanan_hari_raya
+                    ?? 0
+                ),
 
                 'simpanan_rekreasi' =>
-                    (float) (
-                        $rekap
-                            ?->total_simpanan_rekreasi
-                        ?? 0
-                    ),
+                (float) (
+                    $rekap
+                    ?->total_simpanan_rekreasi
+                    ?? 0
+                ),
 
                 'total_simpanan' =>
-                    (float) (
-                        $rekap
-                            ?->total_simpanan
-                        ?? 0
-                    ),
+                (float) (
+                    $rekap
+                    ?->total_simpanan
+                    ?? 0
+                ),
 
                 'jasa_reguler' =>
-                    $this->jumlahJasa(
-                        anggota: $anggota,
-                        tahun: $tahun,
-                        jenis:
-                            Pinjaman::JENIS_REGULER,
-                    ),
+                $this->jumlahJasa(
+                    anggota: $anggota,
+                    tahun: $tahun,
+                    jenis: Pinjaman::JENIS_REGULER,
+                ),
 
                 'jasa_sebrak' =>
-                    $this->jumlahJasa(
-                        anggota: $anggota,
-                        tahun: $tahun,
-                        jenis:
-                            Pinjaman::JENIS_SEBRAK,
-                    ),
+                $this->jumlahJasa(
+                    anggota: $anggota,
+                    tahun: $tahun,
+                    jenis: Pinjaman::JENIS_SEBRAK,
+                ),
             ],
         ];
     }
@@ -240,8 +226,8 @@ class KartuRekeningGridService
         ) {
             $key =
                 $simpanan
-                    ->periode
-                    ->format('Y-m');
+                ->periode
+                ->format('Y-m');
 
             $row =
                 $rows->get(
@@ -254,28 +240,28 @@ class KartuRekeningGridService
 
             $row['simpanan'] = [
                 'simpanan_pokok' =>
-                    (float) $simpanan
-                        ->simpanan_pokok,
+                (float) $simpanan
+                    ->simpanan_pokok,
 
                 'simpanan_wajib' =>
-                    (float) $simpanan
-                        ->simpanan_wajib,
+                (float) $simpanan
+                    ->simpanan_wajib,
 
                 'simpanan_sukarela' =>
-                    (float) $simpanan
-                        ->simpanan_sukarela,
+                (float) $simpanan
+                    ->simpanan_sukarela,
 
                 'simpanan_hari_raya' =>
-                    (float) $simpanan
-                        ->simpanan_hari_raya,
+                (float) $simpanan
+                    ->simpanan_hari_raya,
 
                 'simpanan_rekreasi' =>
-                    (float) $simpanan
-                        ->simpanan_rekreasi,
+                (float) $simpanan
+                    ->simpanan_rekreasi,
 
                 'jumlah_simpanan' =>
-                    (float) $simpanan
-                        ->jumlah_simpanan,
+                (float) $simpanan
+                    ->jumlah_simpanan,
             ];
 
             $rows->put(
@@ -293,41 +279,41 @@ class KartuRekeningGridService
     ): void {
         $pinjamans =
             $anggota
-                ->pinjamans
-                ->where(
-                    'jenis_pinjaman',
-                    $jenis
-                )
-                ->sortBy([
-                    [
-                        'tanggal_pinjaman',
-                        'asc',
-                    ],
-                    [
-                        'id',
-                        'asc',
-                    ],
-                ])
-                ->values();
+            ->pinjamans
+            ->where(
+                'jenis_pinjaman',
+                $jenis
+            )
+            ->sortBy([
+                [
+                    'tanggal_pinjaman',
+                    'asc',
+                ],
+                [
+                    'id',
+                    'asc',
+                ],
+            ])
+            ->values();
 
         $angsurans =
             $pinjamans
-                ->flatMap(
-                    fn (Pinjaman $pinjaman) =>
-                        $pinjaman
-                            ->angsurans
-                )
-                ->sortBy([
-                    [
-                        'periode',
-                        'asc',
-                    ],
-                    [
-                        'id',
-                        'asc',
-                    ],
-                ])
-                ->values();
+            ->flatMap(
+                fn(Pinjaman $pinjaman) =>
+                $pinjaman
+                    ->angsurans
+            )
+            ->sortBy([
+                [
+                    'periode',
+                    'asc',
+                ],
+                [
+                    'id',
+                    'asc',
+                ],
+            ])
+            ->values();
 
         $awalTahun =
             CarbonImmutable::create(
@@ -339,24 +325,24 @@ class KartuRekeningGridService
         $saldo =
             (float) $pinjamans
                 ->filter(
-                    fn (Pinjaman $pinjaman): bool =>
-                        $pinjaman
-                            ->tanggal_pinjaman
-                            ->lt(
-                                $awalTahun
-                            )
+                    fn(Pinjaman $pinjaman): bool =>
+                    $pinjaman
+                        ->tanggal_pinjaman
+                        ->lt(
+                            $awalTahun
+                        )
                 )
                 ->sum(
                     'nominal_pinjaman'
                 )
             - (float) $angsurans
                 ->filter(
-                    fn ($angsuran): bool =>
-                        $angsuran
-                            ->periode
-                            ->lt(
-                                $awalTahun
-                            )
+                    fn($angsuran): bool =>
+                    $angsuran
+                        ->periode
+                        ->lt(
+                            $awalTahun
+                        )
                 )
                 ->sum(
                     'nominal_angsuran'
@@ -368,35 +354,35 @@ class KartuRekeningGridService
         ) {
             $periode =
                 CarbonImmutable
-                    ::createFromFormat(
-                        'Y-m',
-                        $key
-                    )
-                    ->startOfMonth();
+                ::createFromFormat(
+                    'Y-m',
+                    $key
+                )
+                ->startOfMonth();
 
             $saldoAwal =
                 $saldo;
 
             $pinjamanPeriode =
                 $pinjamans
-                    ->filter(
-                        fn (Pinjaman $pinjaman): bool =>
-                            $pinjaman
-                                ->tanggal_pinjaman
-                                ->format('Y-m')
-                            === $key
-                    )
-                    ->values();
+                ->filter(
+                    fn(Pinjaman $pinjaman): bool =>
+                    $pinjaman
+                        ->tanggal_pinjaman
+                        ->format('Y-m')
+                        === $key
+                )
+                ->values();
 
             $angsuran =
                 $angsurans
-                    ->first(
-                        fn ($angsuran): bool =>
-                            $angsuran
-                                ->periode
-                                ->format('Y-m')
-                            === $key
-                    );
+                ->first(
+                    fn($angsuran): bool =>
+                    $angsuran
+                        ->periode
+                        ->format('Y-m')
+                        === $key
+                );
 
             $entries =
                 collect();
@@ -404,24 +390,24 @@ class KartuRekeningGridService
             if ($angsuran) {
                 $entries->push([
                     'client_key' =>
-                        'angsuran-'
-                        .$angsuran->id,
+                    'angsuran-'
+                        . $angsuran->id,
 
                     'entry_id' =>
-                        $angsuran->id,
+                    $angsuran->id,
 
                     'entry_type' =>
-                        'angsuran',
+                    'angsuran',
 
                     'loan_label' =>
-                        'angsuran',
+                    'angsuran',
 
                     'action' =>
-                        'update_angsuran',
+                    'update_angsuran',
 
                     'jumlah' =>
-                        (float) $angsuran
-                            ->nominal_angsuran,
+                    (float) $angsuran
+                        ->nominal_angsuran,
                 ]);
             }
 
@@ -437,26 +423,26 @@ class KartuRekeningGridService
 
                 $entries->push([
                     'client_key' =>
-                        'pinjaman-'
-                        .$pinjaman->id,
+                    'pinjaman-'
+                        . $pinjaman->id,
 
                     'entry_id' =>
-                        $pinjaman->id,
+                    $pinjaman->id,
 
                     'entry_type' =>
-                        'pinjaman',
+                    'pinjaman',
 
                     'loan_label' =>
-                        $isTambahan
-                            ? 'pinjaman_tambahan'
-                            : 'pinjaman',
+                    $isTambahan
+                        ? 'pinjaman_tambahan'
+                        : 'pinjaman',
 
                     'action' =>
-                        'update_pinjaman',
+                    'update_pinjaman',
 
                     'jumlah' =>
-                        (float) $pinjaman
-                            ->nominal_pinjaman,
+                    (float) $pinjaman
+                        ->nominal_pinjaman,
                 ]);
 
                 $saldoUntukLabel +=
@@ -467,14 +453,14 @@ class KartuRekeningGridService
             $jumlahAngsuran =
                 (float) (
                     $angsuran
-                        ?->nominal_angsuran
+                    ?->nominal_angsuran
                     ?? 0
                 );
 
             $jasa =
                 (float) (
                     $angsuran
-                        ?->jasa_pinjaman
+                    ?->jasa_pinjaman
                     ?? 0
                 );
 
@@ -488,31 +474,31 @@ class KartuRekeningGridService
 
             $row[$jenis] = [
                 'entries' =>
-                    $entries
-                        ->values()
-                        ->all(),
+                $entries
+                    ->values()
+                    ->all(),
 
                 'ke' =>
-                    $angsuran
-                        ?->angsuran_ke,
+                $angsuran
+                    ?->angsuran_ke,
 
                 'sisa' =>
-                    $entries->isNotEmpty()
-                        ? $saldo
-                        : null,
+                $entries->isNotEmpty()
+                    ? $saldo
+                    : null,
 
                 'jasa' =>
-                    $jasa,
+                $jasa,
 
                 'jumlah_angsuran' =>
-                    $jumlahAngsuran,
+                $jumlahAngsuran,
 
                 'can_add_angsuran' =>
-                    $saldoAwal > 0
+                $saldoAwal > 0
                     && !$angsuran,
 
                 'has_angsuran' =>
-                    $angsuran
+                $angsuran
                     !== null,
             ];
 
@@ -547,33 +533,33 @@ class KartuRekeningGridService
                 return [
                     $periode
                         ->format('Y-m') => [
-                            'periode' =>
-                                $periode
-                                    ->format('Y-m'),
+                        'periode' =>
+                        $periode
+                            ->format('Y-m'),
 
-                            'bulan' =>
-                                strtoupper(
-                                    $periode
-                                        ->translatedFormat(
-                                            'M'
-                                        )
-                                ),
+                        'bulan' =>
+                        strtoupper(
+                            $periode
+                                ->translatedFormat(
+                                    'M'
+                                )
+                        ),
 
-                            'simpanan' =>
-                                $this
-                                    ->simpananKosong(),
+                        'simpanan' =>
+                        $this
+                            ->simpananKosong(),
 
-                            'reguler' =>
-                                $this
-                                    ->pinjamanKosong(),
+                        'reguler' =>
+                        $this
+                            ->pinjamanKosong(),
 
-                            'sebrak' =>
-                                $this
-                                    ->pinjamanKosong(),
+                        'sebrak' =>
+                        $this
+                            ->pinjamanKosong(),
 
-                            'jumlah_tagihan' =>
-                                0,
-                        ],
+                        'jumlah_tagihan' =>
+                        0,
+                    ],
                 ];
             }
         );
@@ -583,22 +569,22 @@ class KartuRekeningGridService
     {
         return [
             'simpanan_pokok' =>
-                0,
+            0,
 
             'simpanan_wajib' =>
-                0,
+            0,
 
             'simpanan_sukarela' =>
-                0,
+            0,
 
             'simpanan_hari_raya' =>
-                0,
+            0,
 
             'simpanan_rekreasi' =>
-                0,
+            0,
 
             'jumlah_simpanan' =>
-                0,
+            0,
         ];
     }
 
@@ -606,25 +592,25 @@ class KartuRekeningGridService
     {
         return [
             'entries' =>
-                [],
+            [],
 
             'ke' =>
-                null,
+            null,
 
             'sisa' =>
-                null,
+            null,
 
             'jasa' =>
-                0,
+            0,
 
             'jumlah_angsuran' =>
-                0,
+            0,
 
             'can_add_angsuran' =>
-                false,
+            false,
 
             'has_angsuran' =>
-                false,
+            false,
         ];
     }
 
@@ -640,15 +626,15 @@ class KartuRekeningGridService
                 $jenis
             )
             ->flatMap(
-                fn (Pinjaman $pinjaman) =>
-                    $pinjaman
-                        ->angsurans
+                fn(Pinjaman $pinjaman) =>
+                $pinjaman
+                    ->angsurans
             )
             ->filter(
-                fn ($angsuran): bool =>
-                    (int) $angsuran
-                        ->periode
-                        ->format('Y')
+                fn($angsuran): bool =>
+                (int) $angsuran
+                    ->periode
+                    ->format('Y')
                     === $tahun
             )
             ->sum(
