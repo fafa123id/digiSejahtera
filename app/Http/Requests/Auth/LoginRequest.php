@@ -28,7 +28,7 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => ['required', 'string'],
+            'username' => ['required', 'string'],
             'password' => ['required', 'string'],
         ];
     }
@@ -42,31 +42,21 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
-        $emailOrUsername = $this->input('email');
+        $username = $this->input('username');
         $password = $this->input('password');
         $remember = $this->boolean('remember');
 
-        $credentials = $this->isEmail($emailOrUsername)
-            ? ['email' => $emailOrUsername, 'password' => $password]
-            : ['username' => $emailOrUsername, 'password' => $password];
+        $credentials = ['username' => $username, 'password' => $password];
 
         if (! Auth::attempt($credentials, $remember)) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
-                'email' => "Email atau username / password tidak valid.",
+                'username' => "Username atau password salah.",
             ]);
         }
 
         RateLimiter::clear($this->throttleKey());
-    }
-
-    /**
-     * Cek apakah string adalah email
-     */
-    private function isEmail(string $value): bool
-    {
-        return filter_var($value, FILTER_VALIDATE_EMAIL) !== false;
     }
 
     /**
@@ -85,7 +75,7 @@ class LoginRequest extends FormRequest
         $seconds = RateLimiter::availableIn($this->throttleKey());
 
         throw ValidationException::withMessages([
-            'email' => trans('auth.throttle', [
+            'username' => trans('auth.throttle', [
                 'seconds' => $seconds,
                 'minutes' => ceil($seconds / 60),
             ]),
@@ -94,7 +84,7 @@ class LoginRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'email.required' => 'Email atau username harus diisi.',
+            'username.required' => 'Username harus diisi.',
             'password.required' => 'Password harus diisi.',
         ];
     }
@@ -103,6 +93,6 @@ class LoginRequest extends FormRequest
      */
     public function throttleKey(): string
     {
-        return Str::transliterate(Str::lower($this->string('email')).'|'.$this->ip());
+        return Str::transliterate(Str::lower($this->string('username')).'|'.$this->ip());
     }
 }

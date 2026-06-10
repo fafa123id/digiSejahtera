@@ -16,7 +16,7 @@ defineProps({
 });
 
 const form = useForm({
-    email: '',
+    username: '',
     password: '',
     remember: false,
 });
@@ -40,24 +40,23 @@ const submit = () => {
         <!-- Title -->
         <div class="ds-form-header">
             <h1 class="ds-form-title">Masuk ke Akun Anda</h1>
-            <p class="ds-form-subtitle">Masukkan email dan password untuk mengakses dashboard</p>
+            <p class="ds-form-subtitle">Masukkan username dan password untuk mengakses dashboard</p>
         </div>
 
         <form @submit.prevent="submit" class="ds-form">
-            <!-- Email field -->
+            <!-- Username field -->
             <div class="ds-form-group">
-                <InputLabel for="email" value="Email atau username" />
+                <InputLabel for="username" value="Username" />
                 <TextInput
-                    id="email"
+                    id="username"
                     type="text"
                     class="ds-input"
-                    v-model="form.email"
-                    placeholder="nama@email.com atau username"
-                    required
+                    v-model="form.username"
+                    placeholder="username"
                     autofocus
                     autocomplete="username"
                 />
-                <InputError class="ds-error" :message="form.errors.email" />
+                <InputError class="ds-error" :message="form.errors.username " />
             </div>
 
             <!-- Password field -->
@@ -69,7 +68,6 @@ const submit = () => {
                     class="ds-input"
                     v-model="form.password"
                     placeholder="••••••••"
-                    required
                     autocomplete="current-password"
                 />
                 <InputError class="ds-error" :message="form.errors.password" />
