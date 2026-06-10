@@ -92,6 +92,10 @@ COPY . .
 COPY --from=composer_deps /app/vendor ./vendor
 COPY --from=vite_build /var/www/digisejahtera/public/build ./public/build
 COPY --chown=www-data:www-data .docker-secrets/templates/xlsx/template.xlsx ./storage/app/templates/template.xlsx
+COPY --chown=www-data:www-data .docker-secrets/templates/xlsx/template-kitir.xlsx ./storage/app/templates/template-kitir.xlsx
+COPY --chown=www-data:www-data .docker-secrets/templates/xlsx/shr-template.xlsx ./storage/app/templates/shr-template.xlsx
+COPY --chown=www-data:www-data .docker-secrets/templates/xlsx/tagihan-template.xlsx ./storage/app/templates/tagihan-template.xlsx
+
 RUN composer dump-autoload \
   --no-dev \
   --optimize \
