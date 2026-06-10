@@ -6,23 +6,19 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-        Schema::table('total_jasa_pinjaman_on_shu_anggotas', function (Blueprint $table) {
-            //
+        Schema::table('shu_anggotas', function (Blueprint $table): void {
+            $table->renameColumn('total_pinjaman', 'total_jasa_pinjaman');
+            $table->renameColumn('persentase_pinjaman', 'persentase_jasa_pinjaman');
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::table('total_jasa_pinjaman_on_shu_anggotas', function (Blueprint $table) {
-            //
+        Schema::table('shu_anggotas', function (Blueprint $table): void {
+            $table->renameColumn('total_jasa_pinjaman', 'total_pinjaman');
+            $table->renameColumn('persentase_jasa_pinjaman', 'persentase_pinjaman');
         });
     }
 };
