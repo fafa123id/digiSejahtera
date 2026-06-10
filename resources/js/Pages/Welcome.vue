@@ -74,7 +74,7 @@ onUnmounted(() => {
       <div class="ds-nav__inner">
         <div class="ds-nav__brand">
           <div class="ds-nav__logo-wrap">
-            <img src="/images/logo.png" alt="DigiSejahtera" class="ds-nav__logo-img" />
+            <img src="/images/logo.webp" alt="DigiSejahtera" class="ds-nav__logo-img" />
           </div>
           <span class="ds-nav__brand-text">
             <span class="ds-brand-digi">Digi</span><span class="ds-brand-sejahtera">Sejahtera</span>
@@ -258,7 +258,7 @@ onUnmounted(() => {
       <div class="ds-cta__blob" />
       <div class="ds-cta__inner">
         <div class="ds-cta__logo-wrap">
-          <img src="/images/logo.png" alt="DigiSejahtera" class="ds-cta__logo" />
+          <img src="/images/logo.webp" alt="DigiSejahtera" class="ds-cta__logo" />
         </div>
         <h2 class="ds-cta__title">Siap Mengelola Koperasi<br />dengan Lebih Cerdas?</h2>
         <p class="ds-cta__desc">

@@ -31,7 +31,7 @@ import { Link } from "@inertiajs/vue3";
                 <div class="ds-auth-logo-wrap">
                     <div class="ds-nav__logo-wrap">
                         <img
-                            src="/images/logo.png"
+                            src="/images/logo.webp"
                             alt="DigiSejahtera"
                             class="ds-nav__logo-img"
                         />
