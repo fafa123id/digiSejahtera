@@ -54,7 +54,7 @@ class LoginRequest extends FormRequest
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
-                'email' => trans('auth.failed'),
+                'email' => "Email atau username / password tidak valid.",
             ]);
         }
 
@@ -91,7 +91,13 @@ class LoginRequest extends FormRequest
             ]),
         ]);
     }
-
+    public function messages(): array
+    {
+        return [
+            'email.required' => 'Email atau username harus diisi.',
+            'password.required' => 'Password harus diisi.',
+        ];
+    }
     /**
      * Get the rate limiting throttle key for the request.
      */
