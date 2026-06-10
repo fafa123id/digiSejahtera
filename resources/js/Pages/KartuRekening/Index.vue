@@ -693,16 +693,6 @@ const closeToast = () => {
             </Transition>
         </div>
 
-        <div class="print-only">
-            <KartuRekeningSheet
-                v-for="member in localMembers"
-                :key="`print-${member.id}`"
-                :member="member"
-                :dirty-keys="{}"
-                print-mode
-            />
-        </div>
-
         <AnggotaFormModal
             :show="showAnggotaModal"
             :form="anggotaForm"
