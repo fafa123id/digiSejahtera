@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\KartuRekening;
 
+use App\Models\Anggota;
 use Carbon\CarbonImmutable;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -49,7 +50,7 @@ class SaveKartuRekeningRequest extends FormRequest
 
         $this->merge([
             'changes' =>
-                $changes,
+            $changes,
         ]);
     }
 
@@ -142,17 +143,13 @@ class SaveKartuRekeningRequest extends FormRequest
                     as $index => $change
                 ) {
                     $this->validasiPeriode(
-                        validator:
-                            $validator,
+                        validator: $validator,
 
-                        index:
-                            $index,
+                        index: $index,
 
-                        tahun:
-                            $tahun,
+                        tahun: $tahun,
 
-                        periode:
-                            $change['periode']
+                        periode: $change['periode']
                             ?? null,
                     );
 
@@ -165,18 +162,14 @@ class SaveKartuRekeningRequest extends FormRequest
                         === 'anggota'
                     ) {
                         $this->validasiAnggota(
-                            validator:
-                                $validator,
+                            validator: $validator,
 
-                            index:
-                                $index,
+                            index: $index,
 
-                            field:
-                                $change['field']
+                            field: $change['field']
                                 ?? null,
 
-                            value:
-                                $change['value']
+                            value: $change['value']
                                 ?? null,
                         );
 
@@ -188,18 +181,14 @@ class SaveKartuRekeningRequest extends FormRequest
                         === 'simpanan'
                     ) {
                         $this->validasiSimpanan(
-                            validator:
-                                $validator,
+                            validator: $validator,
 
-                            index:
-                                $index,
+                            index: $index,
 
-                            field:
-                                $change['field']
+                            field: $change['field']
                                 ?? null,
 
-                            value:
-                                $change['value']
+                            value: $change['value']
                                 ?? null,
                         );
 
@@ -217,26 +206,20 @@ class SaveKartuRekeningRequest extends FormRequest
                         )
                     ) {
                         $this->validasiTransaksiPinjaman(
-                            validator:
-                                $validator,
+                            validator: $validator,
 
-                            index:
-                                $index,
+                            index: $index,
 
-                            action:
-                                $change['action']
+                            action: $change['action']
                                 ?? null,
 
-                            entryId:
-                                $change['entry_id']
+                            entryId: $change['entry_id']
                                 ?? null,
 
-                            field:
-                                $change['field']
+                            field: $change['field']
                                 ?? null,
 
-                            value:
-                                $change['value']
+                            value: $change['value']
                                 ?? null,
                         );
                     }
@@ -288,35 +271,22 @@ class SaveKartuRekeningRequest extends FormRequest
         ?string $field,
         mixed $value
     ): void {
-        if (
-            $field
-            !== 'nama'
-        ) {
-            $validator
-                ->errors()
-                ->add(
-                    "changes.{$index}.field",
-                    'Field anggota tidak valid.'
-                );
+        if (!in_array($field, ['nama', 'agama'], true)) {
+            $validator->errors()->add("changes.{$index}.field", 'Field anggota tidak valid.');
 
             return;
         }
 
-        if (
-            !is_string(
-                $value
-            )
-            || trim(
-                $value
-            )
-            === ''
-        ) {
-            $validator
-                ->errors()
-                ->add(
-                    "changes.{$index}.value",
-                    'Nama anggota harus diisi.'
-                );
+        if ($field === 'nama') {
+            if (!is_string($value) || trim($value) === '') {
+                $validator->errors()->add("changes.{$index}.value", 'Nama anggota harus diisi.');
+            }
+
+            return;
+        }
+
+        if (!in_array($value, [Anggota::AGAMA_ISLAM, Anggota::AGAMA_NONISLAM], true)) {
+            $validator->errors()->add("changes.{$index}.value", 'Agama anggota tidak valid.');
         }
     }
 
@@ -447,8 +417,8 @@ class SaveKartuRekeningRequest extends FormRequest
                     ],
                     true
                 )
-                    ? 'Nominal pinjaman harus berupa angka valid.'
-                    : 'Nominal angsuran harus berupa angka valid.';
+                ? 'Nominal pinjaman harus berupa angka valid.'
+                : 'Nominal angsuran harus berupa angka valid.';
 
             $validator
                 ->errors()
@@ -473,8 +443,8 @@ class SaveKartuRekeningRequest extends FormRequest
                     ],
                     true
                 )
-                    ? 'Nominal pinjaman tidak boleh negatif.'
-                    : 'Nominal angsuran tidak boleh negatif.';
+                ? 'Nominal pinjaman tidak boleh negatif.'
+                : 'Nominal angsuran tidak boleh negatif.';
 
             $validator
                 ->errors()
@@ -571,6 +541,6 @@ class SaveKartuRekeningRequest extends FormRequest
             '/^-?\d+$/',
             $value
         )
-        === 1;
+            === 1;
     }
 }

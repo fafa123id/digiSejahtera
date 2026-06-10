@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests\Anggota;
 
+use App\Models\Anggota;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreAnggotaRequest extends FormRequest
 {
@@ -19,7 +21,13 @@ class StoreAnggotaRequest extends FormRequest
                 'string',
                 'max:150',
             ],
-
+            'agama' => [
+                'required',
+                Rule::in([
+                    Anggota::AGAMA_ISLAM,
+                    Anggota::AGAMA_NONISLAM,
+                ]),
+            ],
             'tanggal_masuk' => [
                 'required',
                 'date',
@@ -31,13 +39,17 @@ class StoreAnggotaRequest extends FormRequest
     {
         return [
             'nama.required' =>
-                'Nama anggota harus diisi.',
+            'Nama anggota harus diisi.',
 
             'tanggal_masuk.required' =>
-                'Tanggal bergabung harus diisi.',
+            'Tanggal bergabung harus diisi.',
 
             'tanggal_masuk.date' =>
-                'Tanggal bergabung tidak valid.',
+            'Tanggal bergabung tidak valid.',
+            'agama.required' =>
+                'Agama anggota harus diisi.',
+            'agama.in' =>
+                'Agama anggota tidak valid, silakan pilih agama yang tersedia.',
         ];
     }
 }

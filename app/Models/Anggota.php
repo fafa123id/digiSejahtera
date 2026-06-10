@@ -14,10 +14,12 @@ class Anggota extends Model
     protected $table = 'anggotas';
     public const STATUS_AKTIF = 'aktif';
     public const STATUS_NONAKTIF = 'nonaktif';
-
+    public const AGAMA_ISLAM = 'islam';
+    public const AGAMA_NONISLAM = 'nonislam';
     protected $fillable = [
         'nomor_anggota',
         'nama',
+        'agama',
         'tanggal_masuk',
         'tanggal_keluar',
         'status',

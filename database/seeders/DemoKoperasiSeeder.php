@@ -29,6 +29,7 @@ class DemoKoperasiSeeder extends Seeder
             $sparxie = $this->buatAnggota(
                 nomorAnggota: '001',
                 nama: 'sparxie',
+                agama: 'islam',
                 tanggalMasuk: $bulanSekarang
                     ->subYears(2)
                     ->startOfYear()
@@ -37,11 +38,21 @@ class DemoKoperasiSeeder extends Seeder
             $yaoguang = $this->buatAnggota(
                 nomorAnggota: '002',
                 nama: 'yaoguang',
+                agama: 'islam',
                 tanggalMasuk: $bulanSekarang
                     ->subYears(1)
                     ->startOfYear()
             );
-
+            for ($i = 3; $i <= 100; $i++) {
+                $this->buatAnggota(
+                    nomorAnggota: str_pad((string) $i, 3, '0', STR_PAD_LEFT),
+                    nama: "Anggota {$i}",
+                    agama: random_int(0, 1) === 0 ? Anggota::AGAMA_ISLAM : Anggota::AGAMA_NONISLAM,
+                    tanggalMasuk: $bulanSekarang
+                        ->subYears(1)
+                        ->startOfYear()
+                );
+            }
             $this->buatSimpanansparxie(
                 anggota: $sparxie,
                 pencatat: $admin,
@@ -132,20 +143,23 @@ class DemoKoperasiSeeder extends Seeder
     private function buatAnggota(
         string $nomorAnggota,
         string $nama,
+        string $agama,
         CarbonImmutable $tanggalMasuk
     ): Anggota {
         return Anggota::updateOrCreate(
             [
                 'nomor_anggota' =>
-                    $nomorAnggota,
+                $nomorAnggota,
             ],
             [
                 'nama' => $nama,
+                'agama' => $agama,
                 'tanggal_masuk' =>
-                    $tanggalMasuk,
+                $tanggalMasuk,
+
                 'tanggal_keluar' => null,
                 'status' =>
-                    Anggota::STATUS_AKTIF,
+                Anggota::STATUS_AKTIF,
             ]
         );
     }
@@ -168,8 +182,7 @@ class DemoKoperasiSeeder extends Seeder
             simpananSukarela: 25_000,
             simpananHariRaya: 100_000,
             simpananRekreasi: 0,
-            keterangan:
-                'Simpanan awal anggota'
+            keterangan: 'Simpanan awal anggota'
         );
 
         $this->simpanSimpanan(
@@ -229,8 +242,7 @@ class DemoKoperasiSeeder extends Seeder
             simpananSukarela: 50_000,
             simpananHariRaya: 100_000,
             simpananRekreasi: 0,
-            keterangan:
-                'Simpanan awal anggota'
+            keterangan: 'Simpanan awal anggota'
         );
 
         $this->simpanSimpanan(
@@ -255,8 +267,7 @@ class DemoKoperasiSeeder extends Seeder
             simpananSukarela: 50_000,
             simpananHariRaya: -200_000,
             simpananRekreasi: 0,
-            keterangan:
-                'Penarikan simpanan hari raya'
+            keterangan: 'Penarikan simpanan hari raya'
         );
 
         $this->simpanSimpanan(
@@ -295,27 +306,27 @@ class DemoKoperasiSeeder extends Seeder
         return Simpanan::updateOrCreate(
             [
                 'anggota_id' =>
-                    $anggota->id,
+                $anggota->id,
                 'periode' =>
-                    $periode->toDateString(),
+                $periode->toDateString(),
             ],
             [
                 'simpanan_pokok' =>
-                    $simpananPokok,
+                $simpananPokok,
                 'simpanan_wajib' =>
-                    $simpananWajib,
+                $simpananWajib,
                 'simpanan_sukarela' =>
-                    $simpananSukarela,
+                $simpananSukarela,
                 'simpanan_hari_raya' =>
-                    $simpananHariRaya,
+                $simpananHariRaya,
                 'simpanan_rekreasi' =>
-                    $simpananRekreasi,
+                $simpananRekreasi,
                 'jumlah_simpanan' =>
-                    $jumlahSimpanan,
+                $jumlahSimpanan,
                 'keterangan' =>
-                    $keterangan,
+                $keterangan,
                 'created_by' =>
-                    $pencatat->id,
+                $pencatat->id,
             ]
         );
     }
@@ -333,48 +344,48 @@ class DemoKoperasiSeeder extends Seeder
             );
 
         $totalPokok = (float)
-            (clone $query)->sum(
-                'simpanan_pokok'
-            );
+        (clone $query)->sum(
+            'simpanan_pokok'
+        );
 
         $totalWajib = (float)
-            (clone $query)->sum(
-                'simpanan_wajib'
-            );
+        (clone $query)->sum(
+            'simpanan_wajib'
+        );
 
         $totalSukarela = (float)
-            (clone $query)->sum(
-                'simpanan_sukarela'
-            );
+        (clone $query)->sum(
+            'simpanan_sukarela'
+        );
 
         $totalHariRaya = (float)
-            (clone $query)->sum(
-                'simpanan_hari_raya'
-            );
+        (clone $query)->sum(
+            'simpanan_hari_raya'
+        );
 
         $totalRekreasi = (float)
-            (clone $query)->sum(
-                'simpanan_rekreasi'
-            );
+        (clone $query)->sum(
+            'simpanan_rekreasi'
+        );
 
         return RekapSimpanan::updateOrCreate(
             [
                 'anggota_id' =>
-                    $anggota->id,
+                $anggota->id,
             ],
             [
                 'total_simpanan_pokok' =>
-                    $totalPokok,
+                $totalPokok,
                 'total_simpanan_wajib' =>
-                    $totalWajib,
+                $totalWajib,
                 'total_simpanan_sukarela' =>
-                    $totalSukarela,
+                $totalSukarela,
                 'total_simpanan_hari_raya' =>
-                    $totalHariRaya,
+                $totalHariRaya,
                 'total_simpanan_rekreasi' =>
-                    $totalRekreasi,
+                $totalRekreasi,
                 'total_simpanan' =>
-                    $totalPokok
+                $totalPokok
                     + $totalWajib
                     + $totalSukarela
                     + $totalHariRaya
@@ -397,31 +408,31 @@ class DemoKoperasiSeeder extends Seeder
     ): void {
         $tanggalPinjaman =
             $bulanSekarang
-                ->subMonths(3);
+            ->subMonths(3);
 
         $pinjaman = Pinjaman::updateOrCreate(
             [
                 'anggota_id' =>
-                    $anggota->id,
+                $anggota->id,
                 'jenis_pinjaman' =>
-                    Pinjaman::JENIS_REGULER,
+                Pinjaman::JENIS_REGULER,
                 'tanggal_pinjaman' =>
-                    $tanggalPinjaman
-                        ->toDateString(),
+                $tanggalPinjaman
+                    ->toDateString(),
             ],
             [
                 'nominal_pinjaman' =>
-                    20_000_000,
+                20_000_000,
                 'persentase_jasa' =>
-                    1.50,
+                1.50,
                 'sisa_pinjaman' =>
-                    15_500_000,
+                15_500_000,
                 'status' =>
-                    Pinjaman::STATUS_AKTIF,
+                Pinjaman::STATUS_AKTIF,
                 'keterangan' =>
-                    'Pinjaman reguler demo',
+                'Pinjaman reguler demo',
                 'created_by' =>
-                    $pencatat->id,
+                $pencatat->id,
             ]
         );
 
@@ -456,9 +467,9 @@ class DemoKoperasiSeeder extends Seeder
 
         $pinjaman->update([
             'sisa_pinjaman' =>
-                15_500_000,
+            15_500_000,
             'status' =>
-                Pinjaman::STATUS_AKTIF,
+            Pinjaman::STATUS_AKTIF,
         ]);
     }
 
@@ -476,31 +487,31 @@ class DemoKoperasiSeeder extends Seeder
     ): void {
         $tanggalPinjaman =
             $bulanSekarang
-                ->subMonths(2);
+            ->subMonths(2);
 
         $pinjaman = Pinjaman::updateOrCreate(
             [
                 'anggota_id' =>
-                    $anggota->id,
+                $anggota->id,
                 'jenis_pinjaman' =>
-                    Pinjaman::JENIS_SEBRAK,
+                Pinjaman::JENIS_SEBRAK,
                 'tanggal_pinjaman' =>
-                    $tanggalPinjaman
-                        ->toDateString(),
+                $tanggalPinjaman
+                    ->toDateString(),
             ],
             [
                 'nominal_pinjaman' =>
-                    5_000_000,
+                5_000_000,
                 'persentase_jasa' =>
-                    2.00,
+                2.00,
                 'sisa_pinjaman' =>
-                    5_000_000,
+                5_000_000,
                 'status' =>
-                    Pinjaman::STATUS_AKTIF,
+                Pinjaman::STATUS_AKTIF,
                 'keterangan' =>
-                    'Pinjaman sebrak demo',
+                'Pinjaman sebrak demo',
                 'created_by' =>
-                    $pencatat->id,
+                $pencatat->id,
             ]
         );
 
@@ -525,9 +536,9 @@ class DemoKoperasiSeeder extends Seeder
 
         $pinjaman->update([
             'sisa_pinjaman' =>
-                5_000_000,
+            5_000_000,
             'status' =>
-                Pinjaman::STATUS_AKTIF,
+            Pinjaman::STATUS_AKTIF,
         ]);
     }
 
@@ -544,8 +555,8 @@ class DemoKoperasiSeeder extends Seeder
     ): Angsuran {
         $persentaseJasa =
             (float)
-                $pinjaman
-                    ->persentase_jasa;
+            $pinjaman
+                ->persentase_jasa;
 
         $jasaPinjaman =
             $saldoAwal
@@ -565,35 +576,35 @@ class DemoKoperasiSeeder extends Seeder
         return Angsuran::updateOrCreate(
             [
                 'pinjaman_id' =>
-                    $pinjaman->id,
+                $pinjaman->id,
                 'periode' =>
-                    $periode->toDateString(),
+                $periode->toDateString(),
             ],
             [
                 'tanggal_pembayaran' =>
-                    $periode
-                        ->addDays(5)
-                        ->toDateString(),
+                $periode
+                    ->addDays(5)
+                    ->toDateString(),
                 'angsuran_ke' =>
-                    $angsuranKe,
+                $angsuranKe,
                 'saldo_awal' =>
-                    $saldoAwal,
+                $saldoAwal,
                 'nominal_angsuran' =>
-                    $nominalAngsuran,
+                $nominalAngsuran,
                 'persentase_jasa' =>
-                    $persentaseJasa,
+                $persentaseJasa,
                 'jasa_pinjaman' =>
-                    $jasaPinjaman,
+                $jasaPinjaman,
                 'sisa_pinjaman' =>
-                    $sisaPinjaman,
+                $sisaPinjaman,
                 'jumlah_tagihan' =>
-                    $jumlahTagihan,
+                $jumlahTagihan,
                 'keterangan' =>
-                    $nominalAngsuran === 0
-                        ? 'Pembayaran jasa pinjaman'
-                        : 'Pembayaran angsuran pinjaman',
+                $nominalAngsuran === 0
+                    ? 'Pembayaran jasa pinjaman'
+                    : 'Pembayaran angsuran pinjaman',
                 'created_by' =>
-                    $pencatat->id,
+                $pencatat->id,
             ]
         );
     }
@@ -609,58 +620,75 @@ class DemoKoperasiSeeder extends Seeder
         Anggota $anggota
     ): ShuAnggota {
         $totalSimpanan = (float)
-            RekapSimpanan::query()
-                ->where(
-                    'anggota_id',
-                    $anggota->id
-                )
-                ->value(
-                    'total_simpanan'
-                );
+        RekapSimpanan::query()
+            ->where(
+                'anggota_id',
+                $anggota->id
+            )
+            ->value(
+                'total_simpanan'
+            );
 
-        $totalPinjaman = (float)
-            Pinjaman::query()
-                ->where(
-                    'anggota_id',
-                    $anggota->id
-                )
-                ->sum(
-                    'nominal_pinjaman'
-                );
+        $totalJasaPinjaman = (float)
+        Angsuran::query()
+            ->whereHas(
+                'pinjaman',
+                function (
+                    $query
+                ) use (
+                    $anggota
+                ): void {
+                    $query->where(
+                        'anggota_id',
+                        $anggota->id
+                    );
+                }
+            )
+            ->sum(
+                'jasa_pinjaman'
+            );
 
         $shuSimpanan =
             $totalSimpanan
             * 0.50;
 
         $shuPinjaman =
-            $totalPinjaman
+            $totalJasaPinjaman
             * 0.50;
 
         return ShuAnggota::updateOrCreate(
             [
                 'anggota_id' =>
-                    $anggota->id,
+                $anggota->id,
+
                 'tahun' =>
-                    now()->year,
+                now()->year,
             ],
             [
                 'total_simpanan' =>
-                    $totalSimpanan,
-                'total_pinjaman' =>
-                    $totalPinjaman,
+                $totalSimpanan,
+
+                'total_jasa_pinjaman' =>
+                $totalJasaPinjaman,
+
                 'persentase_simpanan' =>
-                    50,
-                'persentase_pinjaman' =>
-                    50,
+                50,
+
+                'persentase_jasa_pinjaman' =>
+                50,
+
                 'shu_simpanan' =>
-                    $shuSimpanan,
+                $shuSimpanan,
+
                 'shu_pinjaman' =>
-                    $shuPinjaman,
+                $shuPinjaman,
+
                 'total_shu' =>
-                    $shuSimpanan
+                $shuSimpanan
                     + $shuPinjaman,
+
                 'calculated_at' =>
-                    now(),
+                now(),
             ]
         );
     }

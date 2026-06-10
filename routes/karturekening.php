@@ -4,10 +4,19 @@ use App\Http\Controllers\AnggotaController;
 use App\Http\Controllers\KartuRekeningController;
 use App\Http\Controllers\KartuRekeningExportController;
 use App\Http\Controllers\KartuRekeningInlineController;
+use App\Http\Controllers\LaporanController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth')
     ->group(function (): void {
+        Route::get('/laporan/simpanan-hari-raya/export', [
+            LaporanController::class,
+            'downloadSHR',
+        ])->name('laporan.simpanan-hari-raya.export');
+        Route::get('/laporan/tagihan-bulanan/export', [
+            LaporanController::class,
+            'downloadTagihan',
+        ])->name('laporan.tagihan-bulanan.export');
         Route::get(
             '/kartu-rekening',
             [

@@ -1,606 +1,487 @@
 <script setup>
-import EditableMoneyCell from '@/Components/KartuRekening/EditableMoneyCell.vue'
-import LoanEntryCell from '@/Components/KartuRekening/LoanEntryCell.vue'
+import EditableMoneyCell from "@/Components/KartuRekening/EditableMoneyCell.vue";
+import LoanEntryCell from "@/Components/KartuRekening/LoanEntryCell.vue";
+import EditableTextField from "./EditableTextField.vue";
 
 const props = defineProps({
-  member: {
-    type: Object,
-    required: true,
-  },
+    member: {
+        type: Object,
+        required: true,
+    },
 
-  dirtyKeys: {
-    type: Object,
-    default: () => ({}),
-  },
+    dirtyKeys: {
+        type: Object,
+        default: () => ({}),
+    },
 
-  printMode: {
-    type: Boolean,
-    default: false,
-  },
-})
+    printMode: {
+        type: Boolean,
+        default: false,
+    },
+});
 
-const emit = defineEmits([
-  'change',
-  'discard',
-  'delete',
-  'keluarkan',
-])
+const emit = defineEmits(["change", "discard", "delete", "keluarkan"]);
 
 const simpananFields = [
-  {
-    key: 'simpanan_pokok',
-    label: 'SIMPOK',
-  },
-
-  {
-    key: 'simpanan_wajib',
-    label: 'SIMWA',
-  },
-
-  {
-    key: 'simpanan_sukarela',
-    label: 'SSR',
-  },
-
-  {
-    key: 'simpanan_hari_raya',
-    label: 'SHR',
-  },
-
-  {
-    key: 'simpanan_rekreasi',
-    label: 'SREK',
-  },
-]
-
-const makeKey = (
-  periode,
-  section,
-  field
-) => {
-  return [
-    props.member.id,
-    periode,
-    section,
-    field,
-  ].join('|')
-}
-
-const isDirty = (
-  periode,
-  section,
-  field
-) => {
-  return Boolean(
-    props.dirtyKeys[
-      makeKey(
-        periode,
-        section,
-        field
-      )
-    ]
-  )
-}
-
-const emitNama = (
-  event
-) => {
-  emit(
-    'change',
     {
-      anggota_id:
-        props.member.id,
+        key: "simpanan_pokok",
+        label: "SIMPOK",
+    },
 
-      periode:
-        props.member.rows[0]
-          ?.periode
-        ?? `${new Date().getFullYear()}-01`,
-
-      section:
-        'anggota',
-
-      field:
-        'nama',
-
-      value:
-        event.target.value,
-    }
-  )
-}
-
-const emitSimpanan = (
-  row,
-  field,
-  value
-) => {
-  emit(
-    'change',
     {
-      anggota_id:
-        props.member.id,
+        key: "simpanan_wajib",
+        label: "SIMWA",
+    },
 
-      periode:
-        row.periode,
+    {
+        key: "simpanan_sukarela",
+        label: "SSR",
+    },
 
-      section:
-        'simpanan',
+    {
+        key: "simpanan_hari_raya",
+        label: "SHR",
+    },
 
-      field,
+    {
+        key: "simpanan_rekreasi",
+        label: "SREK",
+    },
+];
 
-      value,
+const makeKey = (periode, section, field) => {
+    return [props.member.id, periode, section, field].join("|");
+};
+
+const isDirty = (periode, section, field) => {
+    return Boolean(props.dirtyKeys[makeKey(periode, section, field)]);
+};
+
+const emitNama = (value) => {
+    emit("change", {
+        anggota_id: props.member.id,
+        periode:
+            props.member.rows[0]?.periode ?? `${new Date().getFullYear()}-01`,
+        section: "anggota",
+        field: "nama",
+        value,
+    });
+};
+const emitAgama = (value) => {
+    emit("change", {
+        anggota_id: props.member.id,
+        periode:
+            props.member.rows[0]?.periode ?? `${new Date().getFullYear()}-01`,
+        section: "anggota",
+        field: "agama",
+        value,
+    });
+};
+
+const emitSimpanan = (row, field, value) => {
+    emit("change", {
+        anggota_id: props.member.id,
+
+        periode: row.periode,
+
+        section: "simpanan",
+
+        field,
+
+        value,
+    });
+};
+
+const formatNumber = (value, accounting = false) => {
+    if (value === null || value === undefined || Number(value) === 0) {
+        return "-";
     }
-  )
-}
 
-const formatNumber = (
-  value,
-  accounting = false
-) => {
-  if (
-    value === null
-    || value === undefined
-    || Number(value) === 0
-  ) {
-    return '-'
-  }
+    const number = Number(value);
 
-  const number =
-    Number(value)
-
-  const formatted =
-    new Intl.NumberFormat(
-      'id-ID',
-      {
+    const formatted = new Intl.NumberFormat("id-ID", {
         maximumFractionDigits: 0,
-      }
-    ).format(
-      Math.abs(number)
-    )
+    }).format(Math.abs(number));
 
-  if (
-    number < 0
-    && accounting
-  ) {
-    return `(${formatted})`
-  }
+    if (number < 0 && accounting) {
+        return `(${formatted})`;
+    }
 
-  if (number < 0) {
-    return `-${formatted}`
-  }
+    if (number < 0) {
+        return `-${formatted}`;
+    }
 
-  return formatted
-}
+    return formatted;
+};
 
-const nominalClass = (
-  value
-) => {
-  return Number(
-    value ?? 0
-  ) < 0
-    ? 'text-red-600'
-    : 'text-slate-700'
-}
+const nominalClass = (value) => {
+    return Number(value ?? 0) < 0 ? "text-red-600" : "text-slate-700";
+};
 </script>
 
 <template>
-  <article class="print-sheet overflow-hidden rounded-3xl border border-blue-100 bg-white shadow-[0_8px_28px_rgba(26,111,189,0.08)]">
-    <header class="flex flex-col gap-4 border-b border-blue-100 bg-gradient-to-r from-blue-50 to-green-50 px-5 py-4 lg:flex-row lg:items-center lg:justify-between">
-      <div>
-        <p class="text-xs font-black uppercase tracking-[0.14em] text-[#3aab2e]">
-          No. {{ member.nomor_anggota }}
-        </p>
-
-        <input
-          :value="member.nama"
-          type="text"
-          class="mt-1 w-full max-w-md rounded-lg border bg-transparent px-2 py-1 text-xl font-black text-slate-800 outline-none transition"
-          :class="
-            isDirty(
-              member.rows[0]?.periode,
-              'anggota',
-              'nama'
-            )
-              ? 'border-orange-300 bg-orange-50 ring-2 ring-orange-100'
-              : 'border-transparent hover:border-blue-200 focus:border-[#1a6fbd] focus:bg-white focus:ring-2 focus:ring-blue-100'
-          "
-          @input="emitNama"
-        />
-
-        <p class="mt-1 text-xs text-slate-400">
-          Bergabung:
-          {{ member.tanggal_masuk ?? '-' }}
-          ·
-          Status:
-          <span class="font-bold capitalize">
-            {{ member.status }}
-          </span>
-        </p>
-      </div>
-
-      <div
-        v-if="!printMode"
-        class="no-print flex flex-wrap gap-2"
-      >
-        <button
-          v-if="member.status === 'aktif'"
-          type="button"
-          class="rounded-xl bg-slate-100 px-3 py-2 text-xs font-bold text-slate-600 transition hover:bg-slate-200"
-          @click="
-            $emit(
-              'keluarkan',
-              member
-            )
-          "
+    <article
+        class="print-sheet overflow-hidden rounded-3xl border border-blue-100 bg-white shadow-[0_8px_28px_rgba(26,111,189,0.08)]"
+    >
+        <header
+            class="flex flex-col gap-4 border-b border-blue-100 bg-gradient-to-r from-blue-50 to-green-50 px-5 py-4 lg:flex-row lg:items-center lg:justify-between"
         >
-          Keluarkan
-        </button>
+            <div>
+                <p
+                    class="text-xs font-black uppercase tracking-[0.14em] text-[#3aab2e]"
+                >
+                    No. {{ member.nomor_anggota }}
+                </p>
 
-        <button
-          type="button"
-          class="rounded-xl bg-red-50 px-3 py-2 text-xs font-bold text-red-500 transition hover:bg-red-100"
-          @click="
-            $emit(
-              'delete',
-              member
-            )
-          "
-        >
-          Hapus
-        </button>
-      </div>
-    </header>
+                <div class="mt-1">
+                    <EditableTextField
+                        :model-value="member.nama"
+                        :dirty="
+                            isDirty(member.rows[0]?.periode, 'anggota', 'nama')
+                        "
+                        :readonly="printMode"
+                        @change="emitNama"
+                    />
+                </div>
 
-    <div class="overflow-x-auto">
-      <table class="w-full min-w-[1580px] border-collapse text-xs">
-        <thead>
-          <tr class="bg-gradient-to-r from-[#0f4f8e] via-[#1a6fbd] to-[#3aab2e] text-white">
-            <th
-              rowspan="2"
-              class="border border-white/20 px-3 py-3 text-left"
-            >
-              Bulan
-            </th>
+                <p class="mt-1 text-xs text-slate-400">
+                    Bergabung:
+                    {{ member.tanggal_masuk ?? "-" }}
+                    · Status:
+                    <span class="font-bold capitalize">
+                        {{ member.status }}
+                    </span>
+                </p>
+                <div
+                    v-if="!printMode"
+                    class="no-print mt-3 flex flex-wrap items-center gap-2"
+                >
+                    <span class="mr-1 text-xs font-bold text-slate-500">
+                        Agama:
+                    </span>
 
-            <th
-              colspan="6"
-              class="border border-white/20 px-3 py-3 text-center"
-            >
-              Simpanan
-            </th>
+                    <label
+                        class="flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-1.5 transition"
+                        :class="
+                            member.agama === 'islam'
+                                ? 'border-[#1a6fbd] bg-blue-50 text-[#1a6fbd] ring-2 ring-blue-100'
+                                : 'border-slate-200 bg-white text-slate-500 hover:border-blue-200'
+                        "
+                    >
+                        <input
+                            :checked="member.agama === 'islam'"
+                            type="radio"
+                            :name="`agama-${member.id}`"
+                            value="islam"
+                            class="h-3.5 w-3.5 border-slate-300 text-[#1a6fbd] focus:ring-[#1a6fbd]"
+                            @change="emitAgama('islam')"
+                        />
 
-            <th
-              colspan="4"
-              class="border border-white/20 px-3 py-3 text-center"
-            >
-              Pinjaman Reguler
-            </th>
+                        <span class="text-xs font-bold"> Islam </span>
+                    </label>
 
-            <th
-              colspan="4"
-              class="border border-white/20 px-3 py-3 text-center"
-            >
-              Pinjaman Sebrak
-            </th>
+                    <label
+                        class="flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-1.5 transition"
+                        :class="
+                            member.agama === 'nonislam'
+                                ? 'border-[#1a6fbd] bg-blue-50 text-[#1a6fbd] ring-2 ring-blue-100'
+                                : 'border-slate-200 bg-white text-slate-500 hover:border-blue-200'
+                        "
+                    >
+                        <input
+                            :checked="member.agama === 'nonislam'"
+                            type="radio"
+                            :name="`agama-${member.id}`"
+                            value="nonislam"
+                            class="h-3.5 w-3.5 border-slate-300 text-[#1a6fbd] focus:ring-[#1a6fbd]"
+                            @change="emitAgama('nonislam')"
+                        />
 
-            <th
-              rowspan="2"
-              class="border border-white/20 px-3 py-3 text-right"
-            >
-              Jumlah
-              <br>
-              Tagihan
-            </th>
-          </tr>
+                        <span class="text-xs font-bold"> Non-Islam </span>
+                    </label>
 
-          <tr class="bg-[#1a6fbd] text-white">
-            <th
-              v-for="field in simpananFields"
-              :key="field.key"
-              class="border border-white/20 px-3 py-2"
-            >
-              {{ field.label }}
-            </th>
+                    <span
+                        v-if="
+                            isDirty(member.rows[0]?.periode, 'anggota', 'agama')
+                        "
+                        class="rounded-lg bg-orange-50 px-2 py-1 text-[11px] font-bold text-orange-600"
+                    >
+                        Belum disimpan
+                    </span>
+                </div>
+            </div>
 
-            <th class="border border-white/20 px-3 py-2">
-              Jumlah
-            </th>
+            <div v-if="!printMode" class="no-print flex flex-wrap gap-2">
+                <button
+                    v-if="member.status === 'aktif'"
+                    type="button"
+                    class="rounded-xl bg-slate-100 px-3 py-2 text-xs font-bold text-slate-600 transition hover:bg-slate-200"
+                    @click="$emit('keluarkan', member)"
+                >
+                    Keluarkan
+                </button>
 
-            <th class="border border-white/20 px-3 py-2">
-              Ke
-            </th>
+                <button
+                    type="button"
+                    class="rounded-xl bg-red-50 px-3 py-2 text-xs font-bold text-red-500 transition hover:bg-red-100"
+                    @click="$emit('delete', member)"
+                >
+                    Hapus
+                </button>
+            </div>
+        </header>
 
-            <th class="border border-white/20 px-3 py-2">
-              Jumlah
-            </th>
+        <div class="overflow-x-auto">
+            <table class="w-full min-w-[1580px] border-collapse text-xs">
+                <thead>
+                    <tr
+                        class="bg-gradient-to-r from-[#0f4f8e] via-[#1a6fbd] to-[#3aab2e] text-white"
+                    >
+                        <th
+                            rowspan="2"
+                            class="border border-white/20 px-3 py-3 text-left"
+                        >
+                            Bulan
+                        </th>
 
-            <th class="border border-white/20 px-3 py-2">
-              Sisa
-            </th>
+                        <th
+                            colspan="6"
+                            class="border border-white/20 px-3 py-3 text-center"
+                        >
+                            Simpanan
+                        </th>
 
-            <th class="border border-white/20 px-3 py-2">
-              Jasa
-            </th>
+                        <th
+                            colspan="4"
+                            class="border border-white/20 px-3 py-3 text-center"
+                        >
+                            Pinjaman Reguler
+                        </th>
 
-            <th class="border border-white/20 px-3 py-2">
-              Ke
-            </th>
+                        <th
+                            colspan="4"
+                            class="border border-white/20 px-3 py-3 text-center"
+                        >
+                            Pinjaman Sebrak
+                        </th>
 
-            <th class="border border-white/20 px-3 py-2">
-              Jumlah
-            </th>
+                        <th
+                            rowspan="2"
+                            class="border border-white/20 px-3 py-3 text-right"
+                        >
+                            Jumlah
+                            <br />
+                            Tagihan
+                        </th>
+                    </tr>
 
-            <th class="border border-white/20 px-3 py-2">
-              Sisa
-            </th>
+                    <tr class="bg-[#1a6fbd] text-white">
+                        <th
+                            v-for="field in simpananFields"
+                            :key="field.key"
+                            class="border border-white/20 px-3 py-2"
+                        >
+                            {{ field.label }}
+                        </th>
 
-            <th class="border border-white/20 px-3 py-2">
-              Jasa
-            </th>
-          </tr>
-        </thead>
+                        <th class="border border-white/20 px-3 py-2">
+                            Jumlah Simpanan
+                        </th>
 
-        <tbody>
-          <tr
-            v-for="row in member.rows"
-            :key="row.periode"
-            class="transition hover:bg-blue-50/60"
-          >
-            <td class="border border-blue-100 bg-blue-50/40 px-3 py-2 font-black text-[#1a6fbd]">
-              {{ row.bulan }}
-            </td>
+                        <th class="border border-white/20 px-3 py-2">Ke</th>
 
-            <td
-              v-for="field in simpananFields"
-              :key="field.key"
-              class="border border-blue-100 p-1"
-            >
-              <EditableMoneyCell
-                :model-value="
-                  row.simpanan[
-                    field.key
-                  ]
-                "
-                :dirty="
-                  isDirty(
-                    row.periode,
-                    'simpanan',
-                    field.key
-                  )
-                "
-                allow-negative
-                @change="
-                  emitSimpanan(
-                    row,
-                    field.key,
-                    $event
-                  )
-                "
-              />
-            </td>
+                        <th class="border border-white/20 px-3 py-2">Jumlah</th>
 
-            <td
-              class="border border-blue-100 bg-green-50/50 px-3 py-2 text-right font-bold tabular-nums"
-              :class="
-                nominalClass(
-                  row.simpanan
-                    .jumlah_simpanan
-                )
-              "
-            >
-              {{
-                formatNumber(
-                  row.simpanan
-                    .jumlah_simpanan
-                )
-              }}
-            </td>
+                        <th class="border border-white/20 px-3 py-2">Sisa</th>
 
-            <td class="border border-blue-100 px-3 py-2 text-center">
-              {{
-                row.reguler.ke
-                ?? '-'
-              }}
-            </td>
+                        <th class="border border-white/20 px-3 py-2">Jasa</th>
 
-            <td class="border border-blue-100 p-1">
-              <LoanEntryCell
-                :loan="row.reguler"
-                :anggota-id="member.id"
-                :periode="row.periode"
-                section="reguler"
-                :dirty-keys="dirtyKeys"
-                :print-mode="printMode"
-                @change="
-                  $emit(
-                    'change',
-                    $event
-                  )
-                "
-                @discard="
-                  $emit(
-                    'discard',
-                    $event
-                  )
-                "
-              />
-            </td>
+                        <th class="border border-white/20 px-3 py-2">Ke</th>
 
-            <td class="border border-blue-100 px-3 py-2 text-right tabular-nums">
-              {{
-                formatNumber(
-                  row.reguler.sisa
-                )
-              }}
-            </td>
+                        <th class="border border-white/20 px-3 py-2">Jumlah</th>
 
-            <td class="border border-blue-100 px-3 py-2 text-right tabular-nums">
-              {{
-                formatNumber(
-                  row.reguler.jasa
-                )
-              }}
-            </td>
+                        <th class="border border-white/20 px-3 py-2">Sisa</th>
 
-            <td class="border border-blue-100 px-3 py-2 text-center">
-              {{
-                row.sebrak.ke
-                ?? '-'
-              }}
-            </td>
+                        <th class="border border-white/20 px-3 py-2">Jasa</th>
+                    </tr>
+                </thead>
 
-            <td class="border border-blue-100 p-1">
-              <LoanEntryCell
-                :loan="row.sebrak"
-                :anggota-id="member.id"
-                :periode="row.periode"
-                section="sebrak"
-                :dirty-keys="dirtyKeys"
-                :print-mode="printMode"
-                @change="
-                  $emit(
-                    'change',
-                    $event
-                  )
-                "
-                @discard="
-                  $emit(
-                    'discard',
-                    $event
-                  )
-                "
-              />
-            </td>
+                <tbody>
+                    <tr
+                        v-for="row in member.rows"
+                        :key="row.periode"
+                        class="transition hover:bg-blue-50/60"
+                    >
+                        <td
+                            class="border border-blue-100 bg-blue-50/40 px-3 py-2 font-black text-[#1a6fbd]"
+                        >
+                            {{ row.bulan }}
+                        </td>
 
-            <td class="border border-blue-100 px-3 py-2 text-right tabular-nums">
-              {{
-                formatNumber(
-                  row.sebrak.sisa
-                )
-              }}
-            </td>
+                        <td
+                            v-for="field in simpananFields"
+                            :key="field.key"
+                            class="border border-blue-100 p-1"
+                        >
+                            <EditableMoneyCell
+                                :model-value="row.simpanan[field.key]"
+                                :dirty="
+                                    isDirty(row.periode, 'simpanan', field.key)
+                                "
+                                :readonly="printMode"
+                                allow-negative
+                                @change="emitSimpanan(row, field.key, $event)"
+                            />
+                        </td>
 
-            <td class="border border-blue-100 px-3 py-2 text-right tabular-nums">
-              {{
-                formatNumber(
-                  row.sebrak.jasa
-                )
-              }}
-            </td>
+                        <td
+                            class="border border-blue-100 bg-green-50/50 px-3 py-2 text-right font-bold tabular-nums"
+                            :class="nominalClass(row.simpanan.jumlah_simpanan)"
+                        >
+                            {{ formatNumber(row.simpanan.jumlah_simpanan) }}
+                        </td>
 
-            <td
-              class="border border-blue-100 bg-orange-50/50 px-3 py-2 text-right font-black tabular-nums"
-              :class="
-                nominalClass(
-                  row.jumlah_tagihan
-                )
-              "
-            >
-              {{
-                formatNumber(
-                  row.jumlah_tagihan,
-                  true
-                )
-              }}
-            </td>
-          </tr>
-        </tbody>
+                        <td
+                            class="border border-blue-100 px-3 py-2 text-center"
+                        >
+                            {{ row.reguler.ke ?? "-" }}
+                        </td>
 
-        <tfoot>
-          <tr class="bg-slate-50 font-black text-slate-700">
-            <td class="border border-blue-100 px-3 py-3">
-              JUMLAH
-            </td>
+                        <td class="border border-blue-100 p-1">
+                            <LoanEntryCell
+                                :loan="row.reguler"
+                                :anggota-id="member.id"
+                                :periode="row.periode"
+                                section="reguler"
+                                :dirty-keys="dirtyKeys"
+                                :print-mode="printMode"
+                                @change="$emit('change', $event)"
+                                @discard="$emit('discard', $event)"
+                            />
+                        </td>
 
-            <td class="border border-blue-100 px-3 py-3 text-right tabular-nums">
-              {{
-                formatNumber(
-                  member.totals
-                    .simpanan_pokok
-                )
-              }}
-            </td>
+                        <td
+                            class="border border-blue-100 px-3 py-2 text-right tabular-nums"
+                        >
+                            {{ formatNumber(row.reguler.sisa) }}
+                        </td>
 
-            <td class="border border-blue-100 px-3 py-3 text-right tabular-nums">
-              {{
-                formatNumber(
-                  member.totals
-                    .simpanan_wajib
-                )
-              }}
-            </td>
+                        <td
+                            class="border border-blue-100 px-3 py-2 text-right tabular-nums"
+                        >
+                            {{ formatNumber(row.reguler.jasa) }}
+                        </td>
 
-            <td class="border border-blue-100 px-3 py-3 text-right tabular-nums">
-              {{
-                formatNumber(
-                  member.totals
-                    .simpanan_sukarela
-                )
-              }}
-            </td>
+                        <td
+                            class="border border-blue-100 px-3 py-2 text-center"
+                        >
+                            {{ row.sebrak.ke ?? "-" }}
+                        </td>
 
-            <td class="border border-blue-100 px-3 py-3 text-right tabular-nums">
-              {{
-                formatNumber(
-                  member.totals
-                    .simpanan_hari_raya
-                )
-              }}
-            </td>
+                        <td class="border border-blue-100 p-1">
+                            <LoanEntryCell
+                                :loan="row.sebrak"
+                                :anggota-id="member.id"
+                                :periode="row.periode"
+                                section="sebrak"
+                                :dirty-keys="dirtyKeys"
+                                :print-mode="printMode"
+                                @change="$emit('change', $event)"
+                                @discard="$emit('discard', $event)"
+                            />
+                        </td>
 
-            <td class="border border-blue-100 px-3 py-3 text-right tabular-nums">
-              {{
-                formatNumber(
-                  member.totals
-                    .simpanan_rekreasi
-                )
-              }}
-            </td>
+                        <td
+                            class="border border-blue-100 px-3 py-2 text-right tabular-nums"
+                        >
+                            {{ formatNumber(row.sebrak.sisa) }}
+                        </td>
 
-            <td class="border border-blue-100 bg-green-100/60 px-3 py-3 text-right tabular-nums">
-              {{
-                formatNumber(
-                  member.totals
-                    .total_simpanan
-                )
-              }}
-            </td>
+                        <td
+                            class="border border-blue-100 px-3 py-2 text-right tabular-nums"
+                        >
+                            {{ formatNumber(row.sebrak.jasa) }}
+                        </td>
 
-            <td
-              colspan="3"
-              class="border border-blue-100 px-3 py-3 text-center"
-            >
-              Jumlah Jasa Reguler
-            </td>
+                        <td
+                            class="border border-blue-100 bg-orange-50/50 px-3 py-2 text-right font-black tabular-nums"
+                            :class="nominalClass(row.jumlah_tagihan)"
+                        >
+                            {{ formatNumber(row.jumlah_tagihan, true) }}
+                        </td>
+                    </tr>
+                </tbody>
 
-            <td class="border border-blue-100 px-3 py-3 text-right tabular-nums">
-              {{
-                formatNumber(
-                  member.totals
-                    .jasa_reguler
-                )
-              }}
-            </td>
+                <tfoot>
+                    <tr class="bg-slate-50 font-black text-slate-700">
+                        <td class="border border-blue-100 px-3 py-3">JUMLAH</td>
 
-            <td
-              colspan="3"
-              class="border border-blue-100 px-3 py-3 text-center"
-            >
-              Jumlah Jasa Sebrak
-            </td>
+                        <td
+                            class="border border-blue-100 px-3 py-3 text-right tabular-nums"
+                        >
+                            {{ formatNumber(member.totals.simpanan_pokok) }}
+                        </td>
 
-            <td class="border border-blue-100 px-3 py-3 text-right tabular-nums">
-              {{
-                formatNumber(
-                  member.totals
-                    .jasa_sebrak
-                )
-              }}
-            </td>
+                        <td
+                            class="border border-blue-100 px-3 py-3 text-right tabular-nums"
+                        >
+                            {{ formatNumber(member.totals.simpanan_wajib) }}
+                        </td>
 
-            <td class="border border-blue-100" />
-          </tr>
-        </tfoot>
-      </table>
-    </div>
-  </article>
+                        <td
+                            class="border border-blue-100 px-3 py-3 text-right tabular-nums"
+                        >
+                            {{ formatNumber(member.totals.simpanan_sukarela) }}
+                        </td>
+
+                        <td
+                            class="border border-blue-100 px-3 py-3 text-right tabular-nums"
+                        >
+                            {{ formatNumber(member.totals.simpanan_hari_raya) }}
+                        </td>
+
+                        <td
+                            class="border border-blue-100 px-3 py-3 text-right tabular-nums"
+                        >
+                            {{ formatNumber(member.totals.simpanan_rekreasi) }}
+                        </td>
+
+                        <td
+                            class="border border-blue-100 bg-green-100/60 px-3 py-3 text-right tabular-nums"
+                        >
+                            {{ formatNumber(member.totals.total_simpanan) }}
+                        </td>
+
+                        <td
+                            colspan="3"
+                            class="border border-blue-100 px-3 py-3 text-center"
+                        >
+                            Jumlah Jasa Reguler
+                        </td>
+
+                        <td
+                            class="border border-blue-100 px-3 py-3 text-right tabular-nums"
+                        >
+                            {{ formatNumber(member.totals.jasa_reguler) }}
+                        </td>
+
+                        <td
+                            colspan="3"
+                            class="border border-blue-100 px-3 py-3 text-center"
+                        >
+                            Jumlah Jasa Sebrak
+                        </td>
+
+                        <td
+                            class="border border-blue-100 px-3 py-3 text-right tabular-nums"
+                        >
+                            {{ formatNumber(member.totals.jasa_sebrak) }}
+                        </td>
+
+                        <td class="border border-blue-100" />
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </article>
 </template>

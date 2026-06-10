@@ -45,6 +45,61 @@ defineEmits([
         required
       />
 
+      <div>
+        <p class="text-sm font-bold text-slate-700">
+          Agama
+        </p>
+
+        <div class="mt-2 grid grid-cols-2 gap-3">
+          <label
+            class="flex cursor-pointer items-center gap-3 rounded-xl border px-4 py-3 transition"
+            :class="
+              form.agama === 'islam'
+                ? 'border-[#1a6fbd] bg-blue-50 text-[#1a6fbd] ring-2 ring-blue-100'
+                : 'border-slate-200 bg-white text-slate-500 hover:border-blue-200 hover:bg-blue-50/40'
+            "
+          >
+            <input
+              v-model="form.agama"
+              type="radio"
+              value="islam"
+              class="h-4 w-4 border-slate-300 text-[#1a6fbd] focus:ring-[#1a6fbd]"
+            >
+
+            <span class="text-sm font-bold">
+              Islam
+            </span>
+          </label>
+
+          <label
+            class="flex cursor-pointer items-center gap-3 rounded-xl border px-4 py-3 transition"
+            :class="
+              form.agama === 'nonislam'
+                ? 'border-[#1a6fbd] bg-blue-50 text-[#1a6fbd] ring-2 ring-blue-100'
+                : 'border-slate-200 bg-white text-slate-500 hover:border-blue-200 hover:bg-blue-50/40'
+            "
+          >
+            <input
+              v-model="form.agama"
+              type="radio"
+              value="nonislam"
+              class="h-4 w-4 border-slate-300 text-[#1a6fbd] focus:ring-[#1a6fbd]"
+            >
+
+            <span class="text-sm font-bold">
+              Non-Islam
+            </span>
+          </label>
+        </div>
+
+        <p
+          v-if="form.errors.agama"
+          class="mt-2 text-xs font-semibold text-red-500"
+        >
+          {{ form.errors.agama }}
+        </p>
+      </div>
+
       <FormInput
         v-model="form.tanggal_masuk"
         label="Tanggal Bergabung"

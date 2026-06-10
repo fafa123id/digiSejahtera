@@ -61,6 +61,7 @@ const saveProcessing = ref(false);
 
 const anggotaForm = useForm({
     nama: "",
+    agama: "islam",
     tanggal_masuk: "",
 });
 
@@ -184,7 +185,7 @@ const getOriginalValue = (change) => {
     }
 
     if (change.section === "anggota") {
-        return member.nama;
+        return member[change.field];
     }
 
     const row = findRow(member, change.periode);
@@ -210,7 +211,7 @@ const setLocalValue = (change) => {
     }
 
     if (change.section === "anggota") {
-        member.nama = change.value;
+        member[change.field] = change.value;
 
         return;
     }
@@ -359,6 +360,7 @@ const submitAnggota = () => {
             showAnggotaModal.value = false;
 
             anggotaForm.reset();
+            anggotaForm.agama = "islam";
         },
     });
 };
@@ -486,10 +488,12 @@ const closeToast = () => {
                         </select>
                     </div>
 
-                    <div class="flex flex-wrap gap-2">
+                    <div
+                        class="grid w-full grid-cols-1 gap-2 sm:grid-cols-2 lg:w-auto lg:min-w-[540px]"
+                    >
                         <button
                             type="button"
-                            class="rounded-xl bg-gradient-to-r from-[#1a6fbd] to-[#0f4f8e] px-4 py-3 text-sm font-bold text-white shadow-md shadow-blue-200 transition hover:-translate-y-0.5"
+                            class="inline-flex items-center gap-2 rounded-xl bg-[#1a6fbd] px-4 py-2.5 text-sm font-bold text-white shadow-lg shadow-blue-100 transition hover:-translate-y-0.5 hover:bg-[#155d9e]"
                             @click="showAnggotaModal = true"
                         >
                             + Tambah Anggota
@@ -519,6 +523,56 @@ const closeToast = () => {
                             </svg>
 
                             Cetak Kartu Rekening
+                        </a>
+                        <a
+                            :href="
+                                route('laporan.simpanan-hari-raya.export', {
+                                    tahun: selectedYear,
+                                })
+                            "
+                            class="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#3aab2e] to-[#24851c] px-4 py-3 text-sm font-bold text-white shadow-md shadow-green-200 transition hover:-translate-y-0.5"
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                class="h-4 w-4"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                                stroke-width="2"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M12 4v11m0 0 4-4m-4 4-4-4m-4 7h16"
+                                />
+                            </svg>
+
+                            Cetak Laporan SHR
+                        </a>
+                        <a
+                            :href="
+                                route('laporan.tagihan-bulanan.export', {
+                                    tahun: selectedYear,
+                                })
+                            "
+                            class="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#f59e0b] to-[#d97706] px-4 py-3 text-sm font-bold text-white shadow-md shadow-orange-200 transition hover:-translate-y-0.5"
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                class="h-4 w-4"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                                stroke-width="2"
+                            >
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    d="M12 4v11m0 0 4-4m-4 4-4-4m-4 7h16"
+                                />
+                            </svg>
+
+                            Cetak Laporan Tagihan
                         </a>
                     </div>
                 </div>

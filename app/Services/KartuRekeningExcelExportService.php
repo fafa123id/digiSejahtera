@@ -32,7 +32,13 @@ class KartuRekeningExcelExportService
 
     private const LAST_COLUMN =
     'R';
-
+    private function aturPosisiAwal(Spreadsheet $spreadsheet, Worksheet $sheet): void
+    {
+        $spreadsheet->setActiveSheetIndex($spreadsheet->getIndex($sheet));
+        $sheet->setSelectedCell('A1');
+        $sheet->setTopLeftCell('A1');
+        $sheet->setPaneTopLeftCell('A1');
+    }
     /**
      * Menghasilkan file Excel kartu rekening seluruh anggota.
      */
@@ -127,7 +133,10 @@ class KartuRekeningExcelExportService
 
             lastRow: $lastRow,
         );
-
+        $this->aturPosisiAwal(
+            spreadsheet: $spreadsheet,
+            sheet: $sheet,
+        );
         return $this->simpanFile(
             spreadsheet: $spreadsheet,
 
