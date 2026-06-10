@@ -51,6 +51,23 @@ class AnggotaController extends Controller
             )
         );
     }
+    public function ubahAgama(
+        UpdateAnggotaRequest $request,
+        Anggota $anggota,
+        AnggotaService $anggotaService
+    ): RedirectResponse {
+        $anggotaService->ubahAgama(
+            anggota: $anggota,
+            data: $request->validated(),
+        );
+
+        return back()->with(
+            'toast',
+            Toast::success(
+                'Data agama anggota berhasil diubah.'
+            )
+        );
+    }
 
     public function keluarkan(
         Anggota $anggota,
