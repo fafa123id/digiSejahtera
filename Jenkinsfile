@@ -28,15 +28,15 @@ pipeline {
                 file(
                     credentialsId: 'kartu-rekening-digisejahtera',
                     variable: 'REKENING_XLSX_FILE'
-                )
+                ),
                 file(
                     credentialsId: 'kitir-digisejahtera',
                     variable: 'KITIR_XLSX_FILE'
-                )
+                ),
                 file(
                     credentialsId: 'laporanshr-digisejahtera',
                     variable: 'LAPORANSHR_XLSX_FILE'
-                )
+                ),
                 file(
                     credentialsId: 'laporantagihan-digisejahtera',
                     variable: 'LAPORANTAGIHAN_XLSX_FILE'
