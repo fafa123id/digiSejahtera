@@ -38,6 +38,11 @@ const menus = [
         href: "/laporan",
         icon: "report",
     },
+    {
+        label: "Riwayat Transaksi",
+        href: "/riwayat-transaksi",
+        icon: "history",
+    },
 ];
 
 const visibleMenus = computed(() => {
@@ -244,7 +249,8 @@ onUnmounted(() => {
                             <p
                                 class="text-xs font-bold uppercase tracking-[0.18em] text-[#3aab2e]"
                             >
-                                DigiSejahtera
+                                <span class="text-[#1a6fbd]">Digi</span>
+                                <span class="text-[#3aab2e]">Sejahtera</span>
                             </p>
 
                             <h1

@@ -3,6 +3,7 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Pagination from "@/Components/UI/Pagination.vue";
 import { Head, router } from "@inertiajs/vue3";
 import { computed, ref, watch } from "vue";
+import Reveal from "@/Components/UI/Reveal.vue";
 
 const props = defineProps({
     report: {
@@ -86,11 +87,7 @@ watch(totalPages, (pages) => {
 });
 
 const changePage = (page) => {
-    if (
-        page < 1
-        || page > totalPages.value
-        || page === currentPage.value
-    ) {
+    if (page < 1 || page > totalPages.value || page === currentPage.value) {
         return;
     }
 
@@ -140,158 +137,194 @@ const alignmentClass = (column) => {
     <Head title="Laporan — DigiSejahtera" />
 
     <AuthenticatedLayout>
-        <template #title>
-            Laporan
-        </template>
+        <template #title> Laporan </template>
+        <Reveal direction="down" :duration="700">
+            <!-- Heading -->
+            <section
+                class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#0f4f8e] via-[#1a6fbd] to-[#3aab2e] px-6 py-7 text-white shadow-xl shadow-blue-200/70 sm:px-8"
+            >
+                <div
+                    class="absolute -right-16 -top-16 h-48 w-48 rounded-full bg-white/10"
+                />
+                <div
+                    class="absolute -bottom-20 right-28 h-44 w-44 rounded-full bg-white/5"
+                />
 
-        <section class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#0f4f8e] via-[#1a6fbd] to-[#3aab2e] px-6 py-7 text-white shadow-xl shadow-blue-200/70 sm:px-8">
-            <p class="text-xs font-bold uppercase tracking-[0.2em] text-blue-100">
-                Administrasi Koperasi
-            </p>
-
-            <h2 class="mt-2 text-2xl font-black tracking-tight sm:text-3xl">
-                {{ report.title }}
-            </h2>
-
-            <p class="mt-2 max-w-3xl text-sm leading-6 text-blue-50/90">
-                {{ report.description }}
-            </p>
-        </section>
-
-        <section class="mt-6 rounded-3xl border border-blue-100 bg-white p-4 shadow-[0_8px_28px_rgba(26,111,189,0.08)]">
-            <div class="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
-                <div class="flex flex-col gap-3 md:flex-row">
-                    <input
-                        v-model="search"
-                        type="search"
-                        placeholder="Cari nama atau nomor anggota..."
-                        class="w-full rounded-xl border border-blue-100 bg-[#f8fbff] px-4 py-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-[#1a6fbd] focus:bg-white focus:ring-4 focus:ring-blue-100 sm:w-80"
+                <div class="absolute right-8 top-7 hidden gap-2 sm:flex">
+                    <span
+                        class="h-2 w-2 animate-pulse rounded-sm bg-white/40"
                     />
-
-                    <select
-                        v-model="selectedType"
-                        class="rounded-xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm font-bold text-[#1a6fbd] outline-none"
-                        @change="reloadReport"
-                    >
-                        <option
-                            v-for="type in types"
-                            :key="type.value"
-                            :value="type.value"
-                        >
-                            {{ type.label }}
-                        </option>
-                    </select>
-
-                    <select
-                        v-model="selectedYear"
-                        class="rounded-xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm font-bold text-[#1a6fbd] outline-none"
-                        @change="reloadReport"
-                    >
-                        <option
-                            v-for="year in years"
-                            :key="year"
-                            :value="year"
-                        >
-                            {{ year }}
-                        </option>
-                    </select>
+                    <span
+                        class="h-2 w-2 animate-pulse rounded-sm bg-white/60 [animation-delay:200ms]"
+                    />
+                    <span
+                        class="h-2 w-2 animate-pulse rounded-sm bg-white/80 [animation-delay:400ms]"
+                    />
                 </div>
 
-                <a
-                    :href="report.export_url"
-                    class="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#3aab2e] to-[#24851c] px-5 py-3 text-sm font-bold text-white shadow-md shadow-green-200 transition hover:-translate-y-0.5"
-                >
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        class="h-4 w-4"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        stroke-width="2"
+                <div class="relative">
+                    <p
+                        class="text-xs font-bold uppercase tracking-[0.2em] text-blue-100"
                     >
-                        <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            d="M12 4v11m0 0 4-4m-4 4-4-4m-4 7h16"
+                        Administrasi Koperasi
+                    </p>
+
+                    <h2
+                        class="mt-2 text-2xl font-black tracking-tight sm:text-3xl"
+                    >
+                        {{ report.title }}
+                    </h2>
+
+                    <p class="mt-2 max-w-3xl text-sm leading-6 text-blue-50/90">
+                        {{ report.description }}
+                    </p>
+                </div>
+            </section>
+
+            <section
+                class="mt-6 rounded-3xl border border-blue-100 bg-white p-4 shadow-[0_8px_28px_rgba(26,111,189,0.08)]"
+            >
+                <div
+                    class="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between"
+                >
+                    <div class="flex flex-col gap-3 md:flex-row">
+                        <input
+                            v-model="search"
+                            type="search"
+                            placeholder="Cari nama atau nomor anggota..."
+                            class="w-full rounded-xl border border-blue-100 bg-[#f8fbff] px-4 py-3 text-sm outline-none transition placeholder:text-slate-400 focus:border-[#1a6fbd] focus:bg-white focus:ring-4 focus:ring-blue-100 sm:w-80"
                         />
-                    </svg>
 
-                    Cetak Excel
-                </a>
-            </div>
-        </section>
-
-        <section class="mt-5 overflow-hidden rounded-3xl border border-blue-100 bg-white shadow-[0_8px_28px_rgba(26,111,189,0.08)]">
-            <div class="overflow-x-auto">
-                <table class="w-full min-w-max border-collapse text-xs">
-                    <thead>
-                        <tr class="bg-gradient-to-r from-[#0f4f8e] via-[#1a6fbd] to-[#3aab2e] text-white">
-                            <th
-                                v-for="column in report.columns"
-                                :key="column.key"
-                                class="whitespace-nowrap border border-white/20 px-3 py-3 font-black"
-                                :class="alignmentClass(column)"
-                            >
-                                {{ column.label }}
-                            </th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-                        <tr
-                            v-for="row in paginatedRows"
-                            :key="row.id"
-                            class="transition hover:bg-blue-50/60"
+                        <select
+                            v-model="selectedType"
+                            class="rounded-xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm font-bold text-[#1a6fbd] outline-none"
+                            @change="reloadReport"
                         >
-                            <td
-                                v-for="column in report.columns"
-                                :key="column.key"
-                                class="whitespace-nowrap border border-blue-100 px-3 py-2 tabular-nums text-slate-700"
-                                :class="alignmentClass(column)"
+                            <option
+                                v-for="type in types"
+                                :key="type.value"
+                                :value="type.value"
                             >
-                                {{
-                                    column.money
-                                        ? formatNumber(row[column.key])
-                                        : row[column.key]
-                                }}
-                            </td>
-                        </tr>
+                                {{ type.label }}
+                            </option>
+                        </select>
 
-                        <tr v-if="paginatedRows.length === 0">
-                            <td
-                                :colspan="report.columns.length"
-                                class="px-4 py-16 text-center text-sm font-bold text-slate-400"
+                        <select
+                            v-model="selectedYear"
+                            class="rounded-xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm font-bold text-[#1a6fbd] outline-none"
+                            @change="reloadReport"
+                        >
+                            <option
+                                v-for="year in years"
+                                :key="year"
+                                :value="year"
                             >
-                                Data laporan tidak ditemukan.
-                            </td>
-                        </tr>
-                    </tbody>
+                                {{ year }}
+                            </option>
+                        </select>
+                    </div>
 
-                    <tfoot v-if="filteredRows.length > 0">
-                        <tr class="bg-slate-50 font-black text-slate-700">
-                            <td
-                                v-for="column in report.columns"
-                                :key="column.key"
-                                class="whitespace-nowrap border border-blue-100 px-3 py-3 tabular-nums"
-                                :class="alignmentClass(column)"
+                    <a
+                        :href="report.export_url"
+                        class="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#3aab2e] to-[#24851c] px-5 py-3 text-sm font-bold text-white shadow-md shadow-green-200 transition hover:-translate-y-0.5"
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            class="h-4 w-4"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                d="M12 4v11m0 0 4-4m-4 4-4-4m-4 7h16"
+                            />
+                        </svg>
+
+                        Cetak Excel
+                    </a>
+                </div>
+            </section>
+
+            <section
+                class="mt-5 overflow-hidden rounded-3xl border border-blue-100 bg-white shadow-[0_8px_28px_rgba(26,111,189,0.08)]"
+            >
+                <div class="overflow-x-auto">
+                    <table class="w-full min-w-max border-collapse text-xs">
+                        <thead>
+                            <tr
+                                class="bg-gradient-to-r from-[#0f4f8e] via-[#1a6fbd] to-[#3aab2e] text-white"
                             >
-                                <span v-if="column.key === 'nama'">
-                                    JUMLAH
-                                </span>
+                                <th
+                                    v-for="column in report.columns"
+                                    :key="column.key"
+                                    class="whitespace-nowrap border border-white/20 px-3 py-3 font-black"
+                                    :class="alignmentClass(column)"
+                                >
+                                    {{ column.label }}
+                                </th>
+                            </tr>
+                        </thead>
 
-                                <span v-else-if="column.money">
-                                    {{ formatNumber(report.totals[column.key]) }}
-                                </span>
-                            </td>
-                        </tr>
-                    </tfoot>
-                </table>
-            </div>
+                        <tbody>
+                            <tr
+                                v-for="row in paginatedRows"
+                                :key="row.id"
+                                class="transition hover:bg-blue-50/60"
+                            >
+                                <td
+                                    v-for="column in report.columns"
+                                    :key="column.key"
+                                    class="whitespace-nowrap border border-blue-100 px-3 py-2 tabular-nums text-slate-700"
+                                    :class="alignmentClass(column)"
+                                >
+                                    {{
+                                        column.money
+                                            ? formatNumber(row[column.key])
+                                            : row[column.key]
+                                    }}
+                                </td>
+                            </tr>
 
-            <Pagination
-                :pagination="pagination"
-                @change="changePage"
-            />
-        </section>
+                            <tr v-if="paginatedRows.length === 0">
+                                <td
+                                    :colspan="report.columns.length"
+                                    class="px-4 py-16 text-center text-sm font-bold text-slate-400"
+                                >
+                                    Data laporan tidak ditemukan.
+                                </td>
+                            </tr>
+                        </tbody>
+
+                        <tfoot v-if="filteredRows.length > 0">
+                            <tr class="bg-slate-50 font-black text-slate-700">
+                                <td
+                                    v-for="column in report.columns"
+                                    :key="column.key"
+                                    class="whitespace-nowrap border border-blue-100 px-3 py-3 tabular-nums"
+                                    :class="alignmentClass(column)"
+                                >
+                                    <span v-if="column.key === 'nama'">
+                                        JUMLAH
+                                    </span>
+
+                                    <span v-else-if="column.money">
+                                        {{
+                                            formatNumber(
+                                                report.totals[column.key],
+                                            )
+                                        }}
+                                    </span>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+
+                <Pagination :pagination="pagination" @change="changePage" />
+            </section>
+        </Reveal>
     </AuthenticatedLayout>
 </template>
