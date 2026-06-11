@@ -7,7 +7,7 @@ volumes:
   laravel_cache:
 
 services:
-  app-digisejahtera:
+  app-digisejahtera-dev:
     build:
       context: .
       dockerfile: Dockerfile
@@ -26,7 +26,7 @@ services:
     networks:
       - shared-network
 
-  nginx-digisejahtera:
+  nginx-digisejahtera-dev:
     build:
       context: .
       dockerfile: Dockerfile
@@ -40,4 +40,4 @@ services:
     networks:
       - shared-network
     depends_on:
-      - app-digisejahtera
+      - app-digisejahtera-dev
