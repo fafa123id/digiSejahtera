@@ -2,7 +2,7 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import KitirCard from "@/Components/Kitir/KitirCard.vue";
 import { Head, router } from "@inertiajs/vue3";
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 import Reveal from "@/Components/UI/Reveal.vue";
 import ToastAlert from "@/Components/UI/ToastAlert.vue";
 
