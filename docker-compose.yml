@@ -7,14 +7,14 @@ volumes:
   laravel_cache:
 
 services:
-  app-digisejahtera:
+  app-digisejahtera-dev:
     build:
       context: .
       dockerfile: Dockerfile
       target: app
       args:
         GIT_HASH: ${GIT_HASH:-unknown}
-    container_name: digisejahtera_app
+    container_name: digisejahtera_app_dev
     restart: unless-stopped
     working_dir: /var/www/digisejahtera
     env_file:
@@ -26,12 +26,12 @@ services:
     networks:
       - shared-network
 
-  nginx-digisejahtera:
+  nginx-digisejahtera-dev:
     build:
       context: .
       dockerfile: Dockerfile
       target: web
-    container_name: digisejahtera_nginx
+    container_name: digisejahtera_nginx_dev
     restart: unless-stopped
     environment:
       VIRTUAL_HOST: digisejahtera-dev.s1gro.online
@@ -40,4 +40,4 @@ services:
     networks:
       - shared-network
     depends_on:
-      - app-digisejahtera
+      - app-digisejahtera-dev
