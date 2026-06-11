@@ -1,7 +1,7 @@
 <script setup>
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import Pagination from "@/Components/UI/Pagination.vue";
-import { Head, router } from "@inertiajs/vue3";
+import { Head, router, usePage } from "@inertiajs/vue3";
 import { computed, ref, watch } from "vue";
 import Reveal from "@/Components/UI/Reveal.vue";
 import ToastAlert from "@/Components/UI/ToastAlert.vue";
@@ -132,6 +132,11 @@ const alignmentClass = (column) => {
 
     return "text-left";
 };
+const page = usePage();
+
+const errors = computed(() => {
+    return page.props.errors ?? {};
+});
 
 const flash = computed(() => {
     return page.props.flash ?? {};
