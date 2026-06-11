@@ -14,7 +14,7 @@ services:
       target: app
       args:
         GIT_HASH: ${GIT_HASH:-unknown}
-    container_name: digisejahtera_app
+    container_name: digisejahtera_app_dev
     restart: unless-stopped
     working_dir: /var/www/digisejahtera
     env_file:
@@ -31,7 +31,7 @@ services:
       context: .
       dockerfile: Dockerfile
       target: web
-    container_name: digisejahtera_nginx
+    container_name: digisejahtera_nginx_dev
     restart: unless-stopped
     environment:
       VIRTUAL_HOST: digisejahtera-dev.s1gro.online
