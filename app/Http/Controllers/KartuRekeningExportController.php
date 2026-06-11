@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Anggota;
 use App\Services\KartuRekeningExcelExportService;
+use App\Support\Toast;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
@@ -11,7 +13,7 @@ class KartuRekeningExportController extends Controller
     public function download(
         Request $request,
         KartuRekeningExcelExportService $exportService
-    ): BinaryFileResponse {
+    ) {
         $validated = $request->validate([
             'tahun' => [
                 'nullable',
@@ -20,6 +22,14 @@ class KartuRekeningExportController extends Controller
                 'max:2100',
             ],
         ]);
+        if (!Anggota::exists()) {
+            return back()->with(
+                'toast',
+                Toast::error(
+                    'Data anggota tidak ditemukan.'
+                )
+            );
+        }
 
         $tahun =
             (int) (
@@ -29,17 +39,15 @@ class KartuRekeningExportController extends Controller
 
         $path =
             $exportService
-                ->generate(
-                    $tahun
-                );
+            ->generate(
+                $tahun
+            );
 
         return response()
             ->download(
-                file:
-                    $path,
+                file: $path,
 
-                name:
-                    "kartu-rekening-{$tahun}.xlsx"
+                name: "kartu-rekening-{$tahun}.xlsx"
             )
             ->deleteFileAfterSend(
                 true

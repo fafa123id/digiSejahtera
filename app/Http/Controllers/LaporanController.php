@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Anggota;
 use App\Services\LaporanJasaPinjamanExcelExportService;
 use App\Services\LaporanJasaPinjamanService;
 use App\Services\LaporanShuExcelExportService;
 use App\Services\LaporanShuService;
 use App\Services\LaporanSimpananHariRayaExcelExportService;
 use App\Services\LaporanTagihanBulananExcelExportService;
+use App\Support\Toast;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -60,8 +62,16 @@ class LaporanController extends Controller
     public function exportJasaPinjaman(
         Request $request,
         LaporanJasaPinjamanExcelExportService $exportService
-    ): BinaryFileResponse {
+    ) {
         $tahun = $this->validasiTahun($request);
+        if (!Anggota::exists()) {
+            return back()->with(
+                'toast',
+                Toast::error(
+                    'Data anggota tidak ditemukan.'
+                )
+            );
+        }
         $path = $exportService->generate($tahun);
 
         return response()
@@ -72,8 +82,16 @@ class LaporanController extends Controller
     public function exportShu(
         Request $request,
         LaporanShuExcelExportService $exportService
-    ): BinaryFileResponse {
+    ) {
         $tahun = $this->validasiTahun($request);
+        if (!Anggota::exists()) {
+            return back()->with(
+                'toast',
+                Toast::error(
+                    'Data anggota tidak ditemukan.'
+                )
+            );
+        }
         $path = $exportService->generate($tahun);
 
         return response()
@@ -84,8 +102,16 @@ class LaporanController extends Controller
     public function exportSimpananHariRaya(
         Request $request,
         LaporanSimpananHariRayaExcelExportService $exportService
-    ): BinaryFileResponse {
+    ) {
         $tahun = $this->validasiTahun($request);
+        if (!Anggota::exists()) {
+            return back()->with(
+                'toast',
+                Toast::error(
+                    'Data anggota tidak ditemukan.'
+                )
+            );
+        }
         $path = $exportService->generate($tahun);
 
         return response()
@@ -96,8 +122,16 @@ class LaporanController extends Controller
     public function exportTagihanBulanan(
         Request $request,
         LaporanTagihanBulananExcelExportService $exportService
-    ): BinaryFileResponse {
+    ) {
         $tahun = $this->validasiTahun($request);
+        if (!Anggota::exists()) {
+            return back()->with(
+                'toast',
+                Toast::error(
+                    'Data anggota tidak ditemukan.'
+                )
+            );
+        }
         $path = $exportService->generate($tahun);
 
         return response()

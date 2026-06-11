@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Anggota;
 use App\Services\KitirExcelExportService;
 use App\Services\KitirService;
+use App\Support\Toast;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -167,7 +169,7 @@ class KitirController extends Controller
     public function download(
         Request $request,
         KitirExcelExportService $exportService
-    ): BinaryFileResponse {
+    ) {
         $validated = $request->validate([
             'tahun' => [
                 'required',
@@ -183,6 +185,15 @@ class KitirController extends Controller
                 'max:12',
             ],
         ]);
+
+        if (!Anggota::exists()) {
+            return back()->with(
+                'toast',
+                Toast::error(
+                    'Data anggota tidak ditemukan.'
+                )
+            );
+        }
 
         $tahun =
             (int) $validated['tahun'];
