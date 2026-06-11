@@ -11,11 +11,11 @@ Route::middleware('auth')
     ->group(function (): void {
         Route::get('/laporan/simpanan-hari-raya/export', [
             LaporanController::class,
-            'downloadSHR',
+            'exportSimpananHariRaya',
         ])->name('laporan.simpanan-hari-raya.export');
         Route::get('/laporan/tagihan-bulanan/export', [
             LaporanController::class,
-            'downloadTagihan',
+            'exportTagihanBulanan',
         ])->name('laporan.tagihan-bulanan.export');
         Route::get(
             '/kartu-rekening',
