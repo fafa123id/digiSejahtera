@@ -3,9 +3,11 @@ import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import AnggotaFormModal from "@/Components/KartuRekening/AnggotaFormModal.vue";
 import KartuRekeningSheet from "@/Components/KartuRekening/KartuRekeningSheet.vue";
 import ConfirmModal from "@/Components/UI/ConfirmModal.vue";
+import Pagination from "@/Components/UI/Pagination.vue";
 import ToastAlert from "@/Components/UI/ToastAlert.vue";
 import { Head, router, useForm, usePage } from "@inertiajs/vue3";
-import { computed, nextTick, ref, watch } from "vue";
+import { computed, ref, watch } from "vue";
+
 const props = defineProps({
     members: {
         type: Array,
@@ -25,6 +27,8 @@ const props = defineProps({
 
 const page = usePage();
 
+const perPage = 10;
+
 const clone = (value) => {
     return JSON.parse(JSON.stringify(value));
 };
@@ -43,9 +47,11 @@ const localMembers = ref(clone(props.members));
 
 const originalMembers = ref(clone(props.members));
 
-const dirtyChanges = ref({});
-
 const search = ref("");
+
+const currentPage = ref(1);
+
+const dirtyChanges = ref({});
 
 const selectedYear = ref(props.filters.tahun);
 
@@ -81,26 +87,59 @@ const filteredMembers = computed(() => {
     }
 
     return localMembers.value.filter((member) => {
-        return (
-            member.nama.toLowerCase().includes(keyword) ||
-            member.nomor_anggota.toLowerCase().includes(keyword)
-        );
+        const nama = String(member.nama ?? "").toLowerCase();
+        const nomorAnggota = String(member.nomor_anggota ?? "").toLowerCase();
+
+        return nama.includes(keyword) || nomorAnggota.includes(keyword);
     });
+});
+
+const totalPages = computed(() => {
+    return Math.max(1, Math.ceil(filteredMembers.value.length / perPage));
+});
+
+const paginatedMembers = computed(() => {
+    const start = (currentPage.value - 1) * perPage;
+    const end = start + perPage;
+
+    return filteredMembers.value.slice(start, end);
+});
+
+const pagination = computed(() => {
+    const total = filteredMembers.value.length;
+    const from = total === 0 ? 0 : (currentPage.value - 1) * perPage + 1;
+    const to = Math.min(currentPage.value * perPage, total);
+
+    return {
+        current_page: currentPage.value,
+        last_page: totalPages.value,
+        from,
+        to,
+        total,
+    };
 });
 
 watch(
     () => props.members,
     (members) => {
         localMembers.value = clone(members);
-
         originalMembers.value = clone(members);
-
         dirtyChanges.value = {};
     },
     {
         deep: true,
     },
 );
+
+watch(search, () => {
+    currentPage.value = 1;
+});
+
+watch(totalPages, (pages) => {
+    if (currentPage.value > pages) {
+        currentPage.value = pages;
+    }
+});
 
 watch(
     () => flash.value.toast,
@@ -126,9 +165,7 @@ watch(
 
         toast.value = {
             id: `error-${Date.now()}`,
-
             type: "error",
-
             message: firstError,
         };
     },
@@ -144,11 +181,8 @@ const isLoanSection = (section) => {
 const makeKey = (change) => {
     const keys = [
         change.anggota_id,
-
         change.periode,
-
         change.section,
-
         change.field,
     ];
 
@@ -251,7 +285,6 @@ const hitungPreviewRow = (row) => {
     }, 0);
 
     const totalReguler = totalTagihanPinjamanPreview(row.reguler);
-
     const totalSebrak = totalTagihanPinjamanPreview(row.sebrak);
 
     row.jumlah_tagihan =
@@ -259,9 +292,9 @@ const hitungPreviewRow = (row) => {
 };
 
 const totalTagihanPinjamanPreview = (loan) => {
-    const angsuran = loan.entries.find(
-        (entry) => entry.entry_type === "angsuran",
-    );
+    const angsuran = loan.entries.find((entry) => {
+        return entry.entry_type === "angsuran";
+    });
 
     return Number(angsuran?.jumlah || 0) + Number(loan.jasa || 0);
 };
@@ -280,7 +313,6 @@ const normalize = (section, value) => {
 
 const handleChange = (change) => {
     const key = makeKey(change);
-
     const originalValue = getOriginalValue(change);
 
     setLocalValue(change);
@@ -305,6 +337,23 @@ const discardNewLoanEntry = (clientKey) => {
         });
 };
 
+const changePage = (pageNumber) => {
+    if (
+        pageNumber < 1 ||
+        pageNumber > totalPages.value ||
+        pageNumber === currentPage.value
+    ) {
+        return;
+    }
+
+    currentPage.value = pageNumber;
+
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+    });
+};
+
 const saveChanges = () => {
     if (!hasDirty.value) {
         return;
@@ -316,7 +365,6 @@ const saveChanges = () => {
         route("kartu-rekening.update"),
         {
             tahun: selectedYear.value,
-
             changes: Object.values(dirtyChanges.value),
         },
         {
@@ -346,7 +394,6 @@ const changeYear = () => {
         },
         {
             preserveState: false,
-
             replace: true,
         },
     );
@@ -367,13 +414,11 @@ const submitAnggota = () => {
 
 const openDeleteModal = (member) => {
     selectedMember.value = member;
-
     showDeleteModal.value = true;
 };
 
 const openKeluarkanModal = (member) => {
     selectedMember.value = member;
-
     showKeluarkanModal.value = true;
 };
 
@@ -387,7 +432,6 @@ const submitDelete = () => {
 
         onSuccess: () => {
             showDeleteModal.value = false;
-
             selectedMember.value = null;
         },
     });
@@ -406,17 +450,10 @@ const submitKeluarkan = () => {
 
             onSuccess: () => {
                 showKeluarkanModal.value = false;
-
                 selectedMember.value = null;
             },
         },
     );
-};
-
-const printAll = async () => {
-    await nextTick();
-
-    window.print();
 };
 
 const closeToast = () => {
@@ -524,6 +561,7 @@ const closeToast = () => {
 
                             Cetak Kartu Rekening
                         </a>
+
                         <a
                             :href="
                                 route('laporan.simpanan-hari-raya.export', {
@@ -549,6 +587,7 @@ const closeToast = () => {
 
                             Cetak Laporan SHR
                         </a>
+
                         <a
                             :href="
                                 route('laporan.tagihan-bulanan.export', {
@@ -587,7 +626,7 @@ const closeToast = () => {
 
             <section class="mt-5 space-y-5">
                 <KartuRekeningSheet
-                    v-for="member in filteredMembers"
+                    v-for="member in paginatedMembers"
                     :key="member.id"
                     :member="member"
                     :dirty-keys="dirtyChanges"
@@ -618,6 +657,13 @@ const closeToast = () => {
                 </div>
             </section>
 
+            <section
+                v-if="filteredMembers.length > 0"
+                class="mt-5 overflow-hidden rounded-2xl border border-blue-100 bg-white shadow-[0_8px_28px_rgba(26,111,189,0.08)]"
+            >
+                <Pagination :pagination="pagination" @change="changePage" />
+            </section>
+
             <Transition
                 enter-active-class="transition duration-300 ease-out"
                 leave-active-class="transition duration-200 ease-in"
@@ -645,16 +691,6 @@ const closeToast = () => {
                     </button>
                 </div>
             </Transition>
-        </div>
-
-        <div class="print-only">
-            <KartuRekeningSheet
-                v-for="member in localMembers"
-                :key="`print-${member.id}`"
-                :member="member"
-                :dirty-keys="{}"
-                print-mode
-            />
         </div>
 
         <AnggotaFormModal

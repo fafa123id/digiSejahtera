@@ -1,6 +1,11 @@
 pipeline {
     
     agent any
+
+    options {
+        skipDefaultCheckout(true)
+        disableConcurrentBuilds()
+    }
     
     stages {
         stage('Checkout Code from GitHub') {
@@ -23,12 +28,27 @@ pipeline {
                 file(
                     credentialsId: 'kartu-rekening-digisejahtera',
                     variable: 'REKENING_XLSX_FILE'
+                ),
+                file(
+                    credentialsId: 'kitir-digisejahtera',
+                    variable: 'KITIR_XLSX_FILE'
+                ),
+                file(
+                    credentialsId: 'laporanshr-digisejahtera',
+                    variable: 'LAPORANSHR_XLSX_FILE'
+                ),
+                file(
+                    credentialsId: 'laporantagihan-digisejahtera',
+                    variable: 'LAPORANTAGIHAN_XLSX_FILE'
                 )
             ]) {
                 sh '''
                     rm -rf .docker-secrets
                     mkdir -p .docker-secrets/templates/xlsx
                     cp "$REKENING_XLSX_FILE" ".docker-secrets/templates/xlsx/template.xlsx"
+                    cp "$KITIR_XLSX_FILE" ".docker-secrets/templates/xlsx/template-kitir.xlsx"
+                    cp "$LAPORANSHR_XLSX_FILE" ".docker-secrets/templates/xlsx/shr-template.xlsx"
+                    cp "$LAPORANTAGIHAN_XLSX_FILE" ".docker-secrets/templates/xlsx/tagihan-template.xlsx"
                 '''
             }
         }

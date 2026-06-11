@@ -92,7 +92,7 @@ onUnmounted(() => {
                 class="flex h-20 items-center gap-3 border-b border-blue-50 px-6"
             >
                 <img
-                    src="/images/logo.png"
+                    src="/images/logo.webp"
                     alt="Logo DigiSejahtera"
                     class="h-12 w-12 object-contain drop-shadow-sm"
                 />
