@@ -17,7 +17,7 @@ pipeline {
 
         stage('Create .env from Credentials') {
             steps {
-                withCredentials([file(credentialsId: 'digisejahtera-env-dev', variable: 'DOTENV_FILE')]) {
+                withCredentials([file(credentialsId: 'digisejahtera-env-prod', variable: 'DOTENV_FILE')]) {
                     sh "cp \$DOTENV_FILE .env"
                 }
             }
