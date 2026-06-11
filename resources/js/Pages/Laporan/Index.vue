@@ -4,6 +4,7 @@ import Pagination from "@/Components/UI/Pagination.vue";
 import { Head, router } from "@inertiajs/vue3";
 import { computed, ref, watch } from "vue";
 import Reveal from "@/Components/UI/Reveal.vue";
+import ToastAlert from "@/Components/UI/ToastAlert.vue";
 
 const props = defineProps({
     report: {
@@ -131,6 +132,46 @@ const alignmentClass = (column) => {
 
     return "text-left";
 };
+
+const flash = computed(() => {
+    return page.props.flash ?? {};
+});
+const toast = ref(null);
+watch(
+    () => flash.value.toast,
+    (newToast) => {
+        if (newToast) {
+            toast.value = newToast;
+        }
+    },
+    {
+        immediate: true,
+        deep: true,
+    },
+);
+
+watch(
+    errors,
+    (newErrors) => {
+        const firstError = Object.values(newErrors)[0];
+
+        if (!firstError) {
+            return;
+        }
+
+        toast.value = {
+            id: `error-${Date.now()}`,
+            type: "error",
+            message: firstError,
+        };
+    },
+    {
+        deep: true,
+    },
+);
+const closeToast = () => {
+    toast.value = null;
+};
 </script>
 
 <template>
@@ -139,6 +180,13 @@ const alignmentClass = (column) => {
     <AuthenticatedLayout>
         <template #title> Laporan </template>
         <Reveal direction="down" :duration="700">
+            <ToastAlert
+                v-if="toast"
+                :key="toast.id"
+                :message="toast.message"
+                :type="toast.type"
+                @close="closeToast"
+            />
             <!-- Heading -->
             <section
                 class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#0f4f8e] via-[#1a6fbd] to-[#3aab2e] px-6 py-7 text-white shadow-xl shadow-blue-200/70 sm:px-8"

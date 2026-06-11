@@ -4,6 +4,7 @@ import KitirCard from "@/Components/Kitir/KitirCard.vue";
 import { Head, router } from "@inertiajs/vue3";
 import { computed, ref } from "vue";
 import Reveal from "@/Components/UI/Reveal.vue";
+import ToastAlert from "@/Components/UI/ToastAlert.vue";
 
 const props = defineProps({
     kitirs: {
@@ -71,6 +72,45 @@ const changePeriod = () => {
         },
     );
 };
+const flash = computed(() => {
+    return page.props.flash ?? {};
+});
+const toast = ref(null);
+watch(
+    () => flash.value.toast,
+    (newToast) => {
+        if (newToast) {
+            toast.value = newToast;
+        }
+    },
+    {
+        immediate: true,
+        deep: true,
+    },
+);
+
+watch(
+    errors,
+    (newErrors) => {
+        const firstError = Object.values(newErrors)[0];
+
+        if (!firstError) {
+            return;
+        }
+
+        toast.value = {
+            id: `error-${Date.now()}`,
+            type: "error",
+            message: firstError,
+        };
+    },
+    {
+        deep: true,
+    },
+);
+const closeToast = () => {
+    toast.value = null;
+};
 </script>
 
 <template>
@@ -79,6 +119,13 @@ const changePeriod = () => {
     <AuthenticatedLayout>
         <template #title> KITIR </template>
         <Reveal direction="down" :duration="700">
+            <ToastAlert
+                v-if="toast"
+                :key="toast.id"
+                :message="toast.message"
+                :type="toast.type"
+                @close="closeToast"
+            />
             <!-- Heading -->
             <section
                 class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#0f4f8e] via-[#1a6fbd] to-[#3aab2e] px-6 py-7 text-white shadow-xl shadow-blue-200/70 sm:px-8"
