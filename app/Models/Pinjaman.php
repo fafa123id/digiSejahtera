@@ -28,7 +28,6 @@ class Pinjaman extends Model
         'sisa_pinjaman',
         'status',
         'keterangan',
-        'created_by',
     ];
 
     protected function casts(): array

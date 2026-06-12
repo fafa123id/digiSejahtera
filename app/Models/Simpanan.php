@@ -21,7 +21,6 @@ class Simpanan extends Model
         'simpanan_rekreasi',
         'jumlah_simpanan',
         'keterangan',
-        'created_by',
     ];
 
     protected function casts(): array
