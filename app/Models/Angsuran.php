@@ -63,12 +63,4 @@ class Angsuran extends Model
             Pinjaman::class
         );
     }
-
-    public function pencatat(): BelongsTo
-    {
-        return $this->belongsTo(
-            User::class,
-            'created_by'
-        );
-    }
 }

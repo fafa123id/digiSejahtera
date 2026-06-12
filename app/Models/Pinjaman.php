@@ -46,11 +46,6 @@ class Pinjaman extends Model
         return $this->belongsTo(Anggota::class);
     }
 
-    public function pencatat(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'created_by');
-    }
-
     public function angsurans(): HasMany
     {
         return $this->hasMany(Angsuran::class);

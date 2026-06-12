@@ -20,12 +20,10 @@ class KartuRekeningInlineService
 
     public function simpan(
         array $changes,
-        int $userId
     ): void {
         DB::transaction(
             function () use (
                 $changes,
-                $userId
             ): void {
                 $collection =
                     collect(
@@ -45,16 +43,11 @@ class KartuRekeningInlineService
 
                 $this->simpanSimpanan(
                     changes: $collection,
-
-                    userId: $userId,
-
                     affectedAnggotaIds: $affectedAnggotaIds,
                 );
 
                 $this->simpanTransaksiPinjaman(
                     changes: $collection,
-
-                    userId: $userId,
 
                     affectedAnggotaIds: $affectedAnggotaIds,
 
@@ -126,7 +119,6 @@ class KartuRekeningInlineService
 
     private function simpanSimpanan(
         Collection $changes,
-        int $userId,
         array &$affectedAnggotaIds
     ): void {
         $changes
@@ -144,7 +136,6 @@ class KartuRekeningInlineService
                 function (
                     Collection $group
                 ) use (
-                    $userId,
                     &$affectedAnggotaIds
                 ): void {
                     $first =
@@ -169,8 +160,6 @@ class KartuRekeningInlineService
 
                             changes: $group,
 
-                            userId: $userId,
-
                             hitungUlang: false,
                         );
 
@@ -182,7 +171,6 @@ class KartuRekeningInlineService
 
     private function simpanTransaksiPinjaman(
         Collection $changes,
-        int $userId,
         array &$affectedAnggotaIds,
         array &$affectedLoanAccounts
     ): void {
@@ -210,7 +198,6 @@ class KartuRekeningInlineService
                 function (
                     array $change
                 ) use (
-                    $userId,
                     &$affectedAnggotaIds,
                     &$affectedLoanAccounts
                 ): void {
@@ -253,8 +240,6 @@ class KartuRekeningInlineService
                                     ? (int) $change['entry_id']
                                     : null,
 
-                                userId: $userId,
-
                                 hitungUlang: false,
                             ),
 
@@ -278,8 +263,6 @@ class KartuRekeningInlineService
                                 )
                                     ? (int) $change['entry_id']
                                     : null,
-
-                                userId: $userId,
 
                                 hitungUlang: false,
                             ),
