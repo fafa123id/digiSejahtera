@@ -7,9 +7,6 @@ import TextInput from '@/Components/TextInput.vue';
 import { Head, Link, useForm } from '@inertiajs/vue3';
 
 defineProps({
-    canResetPassword: {
-        type: Boolean,
-    },
     status: {
         type: String,
     },
@@ -93,16 +90,6 @@ const submit = () => {
                 </button>
             </div>
 
-            <!-- Forgot password link -->
-            <div class="ds-form-footer">
-                <Link
-                    v-if="canResetPassword"
-                    :href="route('password.request')"
-                    class="ds-link"
-                >
-                    Lupa password?
-                </Link>
-            </div>
         </form>
     </GuestLayout>
 </template>

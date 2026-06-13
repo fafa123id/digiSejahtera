@@ -106,7 +106,7 @@ class DemoKoperasiSeeder extends Seeder
             ],
             [
                 'name' => 'Administrator',
-                'email' => 'admin@digisejahtera.test',
+                'username' => 'admin',
                 'password' => Hash::make(
                     'admin12345'
                 ),
@@ -127,7 +127,7 @@ class DemoKoperasiSeeder extends Seeder
             ],
             [
                 'name' => 'Pengurus Koperasi',
-                'email' => 'pengurus@digisejahtera.test',
+                'username' => 'pengurus',
                 'password' => Hash::make(
                     'pengurus12345'
                 ),

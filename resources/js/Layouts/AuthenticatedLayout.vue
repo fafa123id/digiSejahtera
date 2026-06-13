@@ -96,11 +96,13 @@ onUnmounted(() => {
             <div
                 class="flex h-20 items-center gap-3 border-b border-blue-50 px-6"
             >
-                <img
-                    src="/images/logo.webp"
-                    alt="Logo DigiSejahtera"
-                    class="h-12 w-12 object-contain drop-shadow-sm"
-                />
+                <Link :href="route('dashboard')" class="flex items-center gap-3">
+                    <img
+                        src="/images/logo.webp"
+                        alt="Logo DigiSejahtera"
+                        class="h-12 w-12 object-contain drop-shadow-sm"
+                    />
+                </Link>
 
                 <div>
                     <p class="text-xl font-black tracking-tight">
