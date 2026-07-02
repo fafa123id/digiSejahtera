@@ -124,22 +124,34 @@ class PinjamanCalculationService
         return $totalPinjaman - $totalAngsuran;
     }
 
-    private function getPeriodeTransaksi(int $anggotaId, string $jenisPinjaman, ?CarbonImmutable $mulaiPeriode)
-    {
+    private function getPeriodeTransaksi(
+        int $anggotaId,
+        string $jenisPinjaman,
+        ?CarbonImmutable $mulaiPeriode
+    ): \Illuminate\Support\Collection {
+
         $periodePinjaman = Pinjaman::query()
             ->where('anggota_id', $anggotaId)
             ->where('jenis_pinjaman', $jenisPinjaman)
-            ->when($mulaiPeriode, fn($query) => $query->whereDate('tanggal_pinjaman', '>=', $mulaiPeriode->toDateString()))
-            ->get()
-            ->map(fn(Pinjaman $pinjaman): string => $pinjaman->tanggal_pinjaman->format('Y-m'));
+            ->when(
+                $mulaiPeriode,
+                fn($query) =>
+                $query->whereDate('tanggal_pinjaman', '>=', $mulaiPeriode->toDateString())
+            )
+            ->pluck('tanggal_pinjaman')
+            ->map(fn($tanggal) => CarbonImmutable::parse($tanggal)->format('Y-m'));
 
         $periodeAngsuran = Angsuran::query()
             ->whereHas('pinjaman', fn($query) => $query
                 ->where('anggota_id', $anggotaId)
                 ->where('jenis_pinjaman', $jenisPinjaman))
-            ->when($mulaiPeriode, fn($query) => $query->whereDate('periode', '>=', $mulaiPeriode->toDateString()))
-            ->get()
-            ->map(fn(Angsuran $angsuran): string => $angsuran->periode->format('Y-m'));
+            ->when(
+                $mulaiPeriode,
+                fn($query) =>
+                $query->whereDate('periode', '>=', $mulaiPeriode->toDateString())
+            )
+            ->pluck('periode')
+            ->map(fn($tanggal) => CarbonImmutable::parse($tanggal)->format('Y-m'));
 
         return $periodePinjaman
             ->merge($periodeAngsuran)
@@ -160,6 +172,4 @@ class PinjamanCalculationService
             ->first();
     }
 
-
-    private function perbaruiSisaDanStatusPinjaman(int $anggotaId, string $jenisPinjaman): void {}
 }
