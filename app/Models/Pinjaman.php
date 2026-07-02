@@ -64,7 +64,10 @@ class Pinjaman extends Model
     {
         return $query->where('jenis_pinjaman', self::JENIS_SEBRAK);
     }
-
+    public function pencatat(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
     public function sudahLunas(): bool
     {
         return (float) $this->sisa_pinjaman <= 0;

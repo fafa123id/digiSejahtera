@@ -40,4 +40,9 @@ class Simpanan extends Model
     {
         return $this->belongsTo(Anggota::class);
     }
+
+        public function pencatat(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
 }

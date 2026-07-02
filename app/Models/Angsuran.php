@@ -11,7 +11,7 @@ class Angsuran extends Model
     use HasFactory;
 
     protected $table =
-        'angsurans';
+    'angsurans';
 
     protected $fillable = [
         'pinjaman_id',
@@ -31,28 +31,28 @@ class Angsuran extends Model
     {
         return [
             'periode' =>
-                'date',
+            'date',
 
             'tanggal_pembayaran' =>
-                'date',
+            'date',
 
             'saldo_awal' =>
-                'decimal:2',
+            'decimal:2',
 
             'nominal_angsuran' =>
-                'decimal:2',
+            'decimal:2',
 
             'persentase_jasa' =>
-                'decimal:2',
+            'decimal:2',
 
             'jasa_pinjaman' =>
-                'decimal:2',
+            'decimal:2',
 
             'sisa_pinjaman' =>
-                'decimal:2',
+            'decimal:2',
 
             'jumlah_tagihan' =>
-                'decimal:2',
+            'decimal:2',
         ];
     }
 
@@ -61,5 +61,9 @@ class Angsuran extends Model
         return $this->belongsTo(
             Pinjaman::class
         );
+    }
+    public function pencatat(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by');
     }
 }

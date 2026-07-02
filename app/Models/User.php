@@ -44,4 +44,19 @@ class User extends Authenticatable
     {
         return $this->role === self::ROLE_PENGURUS;
     }
+        public function simpanansDibuat(): HasMany
+    {
+        return $this->hasMany(Simpanan::class, 'created_by');
+    }
+
+    public function pinjamansDibuat(): HasMany
+    {
+        return $this->hasMany(Pinjaman::class, 'created_by');
+    }
+
+    public function angsuransDibuat(): HasMany
+    {
+        return $this->hasMany(Angsuran::class, 'created_by');
+    }
+
 }
