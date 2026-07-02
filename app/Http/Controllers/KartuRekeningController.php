@@ -58,7 +58,8 @@ class KartuRekeningController extends Controller
         $inlineService->simpan(
             changes: $request->validated(
                 'changes'
-            )
+            ),
+            userId: $request->user()->id,
         );
 
         return back()->with(

@@ -42,6 +42,7 @@ class KartuRekeningTransactionService
         Anggota $anggota,
         CarbonImmutable $periode,
         Collection $changes,
+        int $userId,
         bool $hitungUlang = true
     ): bool {
         return DB::transaction(
@@ -49,6 +50,7 @@ class KartuRekeningTransactionService
                 $anggota,
                 $periode,
                 $changes,
+                $userId,
                 $hitungUlang
             ): bool {
                 $simpanan = Simpanan::query()
@@ -140,6 +142,10 @@ class KartuRekeningTransactionService
                     return true;
                 }
 
+                $simpanan->created_by =
+                    $simpanan->created_by
+                    ?? $userId;
+
                 $simpanan->save();
 
                 if ($hitungUlang) {
@@ -168,6 +174,7 @@ class KartuRekeningTransactionService
         string $action,
         mixed $rawValue,
         ?int $pinjamanId,
+        int $userId,
         bool $hitungUlang = true
     ): bool {
         return DB::transaction(
@@ -178,6 +185,7 @@ class KartuRekeningTransactionService
                 $action,
                 $rawValue,
                 $pinjamanId,
+                $userId,
                 $hitungUlang
             ): bool {
                 $nominal =
@@ -193,6 +201,7 @@ class KartuRekeningTransactionService
                         periode: $periode,
                         rawValue: $rawValue,
                         nominal: $nominal,
+                        userId: $userId,
                     ),
 
                     'update_pinjaman' =>
@@ -246,6 +255,7 @@ class KartuRekeningTransactionService
         string $action,
         mixed $rawValue,
         ?int $angsuranId,
+        int $userId,
         bool $hitungUlang = true
     ): bool {
         return DB::transaction(
@@ -256,6 +266,7 @@ class KartuRekeningTransactionService
                 $action,
                 $rawValue,
                 $angsuranId,
+                $userId,
                 $hitungUlang
             ): bool {
                 $nominal =
@@ -271,6 +282,7 @@ class KartuRekeningTransactionService
                         periode: $periode,
                         rawValue: $rawValue,
                         nominal: $nominal,
+                        userId: $userId,
                     ),
 
                     'update_angsuran' =>
@@ -323,6 +335,7 @@ class KartuRekeningTransactionService
         CarbonImmutable $periode,
         mixed $rawValue,
         float $nominal,
+        int $userId
     ): bool {
 
         if (
@@ -387,6 +400,9 @@ class KartuRekeningTransactionService
                 || $sudahAdaPencairan
                 ? 'Tambahan pinjaman'
                 : 'Pencairan pinjaman awal',
+
+            'created_by' =>
+            $userId,
         ]);
 
         return true;
@@ -439,6 +455,7 @@ class KartuRekeningTransactionService
         CarbonImmutable $periode,
         mixed $rawValue,
         float $nominal,
+        int $userId
     ): bool {
         /*
      * Cell kosong berarti user tidak jadi melakukan input.
@@ -579,6 +596,9 @@ class KartuRekeningTransactionService
             $nominal > 0
                 ? 'Pembayaran angsuran pinjaman'
                 : 'Pembayaran jasa pinjaman',
+
+            'created_by' =>
+            $userId,
         ]);
 
         return true;
