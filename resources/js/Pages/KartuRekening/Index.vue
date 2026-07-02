@@ -2,6 +2,7 @@
 import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout.vue";
 import AnggotaFormModal from "@/Components/KartuRekening/AnggotaFormModal.vue";
 import KartuRekeningSheet from "@/Components/KartuRekening/KartuRekeningSheet.vue";
+import ChooseDateModal from "@/Components/KartuRekening/ChooseDateModal.vue";
 import ConfirmModal from "@/Components/UI/ConfirmModal.vue";
 import Pagination from "@/Components/UI/Pagination.vue";
 import ToastAlert from "@/Components/UI/ToastAlert.vue";
@@ -65,7 +66,7 @@ const showKeluarkanModal = ref(false);
 const selectedMember = ref(null);
 
 const saveProcessing = ref(false);
-
+const showChooseDateModal = ref(false);
 const anggotaForm = useForm({
     nama: "",
     agama: "islam",
@@ -273,7 +274,10 @@ const setLocalValue = (change) => {
 
     hitungPreviewRow(row);
 };
-
+const openChooseDateModal = () => {
+    selectedYear.value = props.filters.tahun;
+    showChooseDateModal.value = true;
+};
 const hitungPreviewRow = (row) => {
     row.simpanan.jumlah_simpanan = [
         "simpanan_pokok",
@@ -590,14 +594,10 @@ const closeToast = () => {
                                 Cetak Kartu Rekening
                             </a>
 
-                            <a
-                                :href="
-                                    route('laporan.simpanan-hari-raya.export', {
-                                        tahun: selectedYear,
-                                    })
-                                "
+                            <button
                                 class="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#3aab2e] to-[#24851c] px-4 py-3 text-sm font-bold text-white shadow-md shadow-green-200 transition hover:-translate-y-0.5"
-                            >
+                                    @click="openChooseDateModal"
+                                >
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
                                     class="h-4 w-4"
@@ -614,7 +614,7 @@ const closeToast = () => {
                                 </svg>
 
                                 Cetak Laporan SHR
-                            </a>
+                            </button>
 
                             <a
                                 :href="
@@ -720,7 +720,11 @@ const closeToast = () => {
                     </div>
                 </Transition>
             </div>
-
+            <ChooseDateModal
+                :show="showChooseDateModal"
+                @close="showChooseDateModal = false"
+                :tahun="selectedYear"
+            />
             <AnggotaFormModal
                 :show="showAnggotaModal"
                 :form="anggotaForm"

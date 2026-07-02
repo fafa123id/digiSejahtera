@@ -62,7 +62,7 @@ class KitirExcelExportService
             collect(
                 $this
                     ->kitirService
-                    ->buatSemuaData(
+                    ->generateKitir(
                         tahun: $tahun,
 
                         bulan: $bulan,

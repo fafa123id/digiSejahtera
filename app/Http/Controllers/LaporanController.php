@@ -104,6 +104,9 @@ class LaporanController extends Controller
         LaporanSimpananHariRayaExcelExportService $exportService
     ) {
         $tahun = $this->validasiTahun($request);
+        $bulan = $request->validate([
+            'bulan' => ['required', 'integer', 'min:1', 'max:12'],
+        ])['bulan'];
         if (!Anggota::exists()) {
             return back()->with(
                 'toast',
@@ -112,10 +115,10 @@ class LaporanController extends Controller
                 )
             );
         }
-        $path = $exportService->generate($tahun);
+        $path = $exportService->generate($tahun, $bulan);
 
         return response()
-            ->download($path, "laporan-simpanan-hari-raya-{$tahun}.xlsx")
+            ->download($path, "laporan-simpanan-hari-raya-{$tahun}-.xlsx")
             ->deleteFileAfterSend(true);
     }
 

@@ -42,7 +42,7 @@ class KitirController extends Controller
             [
                 'kitirs' =>
                 $kitirService
-                    ->buatSemuaData(
+                    ->generateKitir(
                         tahun: $tahun,
 
                         bulan: $bulan,
