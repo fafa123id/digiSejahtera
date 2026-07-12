@@ -40,11 +40,11 @@ pipeline {
                 file(
                     credentialsId: 'laporantagihan-digisejahtera',
                     variable: 'LAPORANTAGIHAN_XLSX_FILE'
-                )
+                ),
                 file(
                     credentialsId: 'laporanjasapinjaman-digisejahtera',
                     variable: 'LAPORANJASAPINJAMAN_XLS_FILE'
-                )
+                ),
                 file(
                     credentialsId: 'laporanshu-digisejahtera',
                     variable: 'LAPORANSHU_XLS_FILE'
