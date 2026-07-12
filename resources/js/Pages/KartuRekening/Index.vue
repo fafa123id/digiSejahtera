@@ -89,10 +89,15 @@ const filteredMembers = computed(() => {
     }
 
     return localMembers.value.filter((member) => {
-        const nama = String(member.nama ?? "").toLowerCase();
-        const nomorAnggota = String(member.nomor_anggota ?? "").toLowerCase();
+        const original = originalMembers.value.find((m) => m.id === member.id);
 
-        return nama.includes(keyword) || nomorAnggota.includes(keyword);
+        const nama = String(original?.nama ?? member.nama ?? "").toLowerCase();
+
+        const nomor = String(
+            original?.nomor_anggota ?? member.nomor_anggota ?? "",
+        ).toLowerCase();
+
+        return nama.includes(keyword) || nomor.includes(keyword);
     });
 });
 
@@ -464,6 +469,144 @@ const submitKeluarkan = () => {
 const closeToast = () => {
     toast.value = null;
 };
+const discardChanges = () => {
+    localMembers.value = clone(originalMembers.value);
+    dirtyChanges.value = {};
+};
+const AUTO_COPY_FIELDS = [
+    "simpanan_wajib",
+    "simpanan_sukarela",
+    "simpanan_hari_raya",
+    "simpanan_rekreasi",
+];
+const findPreviousRow = (member, periode) => {
+    const index = member.rows.findIndex(
+        row => row.periode === periode
+    );
+
+    if (index <= 0) {
+        return null;
+    }
+
+    return member.rows[index - 1];
+};
+const findAngsuranEntry = (row) => {
+    return row.reguler.entries.find(entry => {
+        return entry.entry_type === "angsuran";
+    });
+};
+const autoFillRow = (anggotaId, periode) => {
+
+    const member = findMember(
+        localMembers.value,
+        anggotaId
+    );
+
+    if (!member) {
+        return;
+    }
+
+    const row = findRow(
+        member,
+        periode
+    );
+
+    const previousRow =
+        findPreviousRow(
+            member,
+            periode
+        );
+
+    if (!row || !previousRow) {
+        return;
+    }
+
+    AUTO_COPY_FIELDS.forEach(field => {
+
+        handleChange({
+            anggota_id: anggotaId,
+            periode,
+            section: "simpanan",
+            field,
+            value:
+                previousRow.simpanan[field],
+        });
+
+    });
+
+    const previousAngsuran =
+        findAngsuranEntry(
+            previousRow
+        );
+
+    if (!previousAngsuran) {
+        return;
+    }
+
+    const currentAngsuran =
+        findAngsuranEntry(
+            row
+        );
+
+    if (currentAngsuran) {
+
+        handleChange({
+            anggota_id: anggotaId,
+            periode,
+            section: "reguler",
+            field: "jumlah",
+            value:
+                previousAngsuran.jumlah,
+            action:
+                currentAngsuran.action,
+            entry_id:
+                currentAngsuran.entry_id,
+            client_key:
+                currentAngsuran.client_key,
+        });
+
+        return;
+    }
+
+    const clientKey =
+        crypto.randomUUID();
+
+    row.reguler.entries.push({
+        client_key:
+            clientKey,
+
+        entry_id:
+            null,
+
+        entry_type:
+            "angsuran",
+
+        loan_label:
+            "angsuran",
+
+        action:
+            "create_angsuran",
+
+        jumlah:
+            previousAngsuran.jumlah,
+    });
+
+    handleChange({
+        anggota_id: anggotaId,
+        periode,
+        section: "reguler",
+        field: "jumlah",
+        value:
+            previousAngsuran.jumlah,
+        action:
+            "create_angsuran",
+        entry_id:
+            null,
+        client_key:
+            clientKey,
+    });
+
+};
 </script>
 
 <template>
@@ -596,8 +739,8 @@ const closeToast = () => {
 
                             <button
                                 class="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#3aab2e] to-[#24851c] px-4 py-3 text-sm font-bold text-white shadow-md shadow-green-200 transition hover:-translate-y-0.5"
-                                    @click="openChooseDateModal"
-                                >
+                                @click="openChooseDateModal"
+                            >
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
                                     class="h-4 w-4"
@@ -662,6 +805,7 @@ const closeToast = () => {
                         @discard="discardNewLoanEntry"
                         @delete="openDeleteModal"
                         @keluarkan="openKeluarkanModal"
+                        @autofill="autoFillRow"
                     />
 
                     <div
@@ -698,7 +842,14 @@ const closeToast = () => {
                     enter-from-class="translate-y-5 opacity-0"
                     leave-to-class="translate-y-5 opacity-0"
                 >
-                    <div v-if="hasDirty" class="fixed bottom-6 right-6 z-40">
+                    <div v-if="hasDirty" class="fixed bottom-6 right-6 z-40 flex gap-3">
+                        <button
+                            type="button"
+                            class="rounded-2xl bg-white px-5 py-4 text-sm font-bold text-slate-700 shadow-xl transition hover:bg-slate-50"
+                            @click="discardChanges"
+                        >
+                            ↺ Batalkan
+                        </button>
                         <button
                             type="button"
                             :disabled="saveProcessing"
