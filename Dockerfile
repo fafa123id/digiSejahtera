@@ -41,7 +41,7 @@ RUN set -eux; \
 
 COPY --from=composer:2.8.10 /usr/bin/composer /usr/bin/composer
 
-WORKDIR /var/www/digisejahtera
+WORKDIR /var/www/digisejahtera-main
 
 
 # =========================
@@ -66,7 +66,7 @@ RUN composer install \
 # =========================
 FROM node:22-alpine AS vite_build
 
-WORKDIR /var/www/digisejahtera
+WORKDIR /var/www/digisejahtera-main
 
 COPY package*.json ./
 RUN npm install
@@ -83,14 +83,14 @@ RUN npm run build
 # =========================
 FROM php_base AS app
 
-WORKDIR /var/www/digisejahtera
+WORKDIR /var/www/digisejahtera-main
 
 ARG GIT_HASH=unknown
 RUN echo "${GIT_HASH}" > .version
 
 COPY . .
 COPY --from=composer_deps /app/vendor ./vendor
-COPY --from=vite_build /var/www/digisejahtera/public/build ./public/build
+COPY --from=vite_build /var/www/digisejahtera-main/public/build ./public/build
 COPY --chown=www-data:www-data .docker-secrets/templates/xlsx/template.xlsx ./storage/app/templates/template.xlsx
 COPY --chown=www-data:www-data .docker-secrets/templates/xlsx/template-kitir.xlsx ./storage/app/templates/template-kitir.xlsx
 COPY --chown=www-data:www-data .docker-secrets/templates/xlsx/shr-template.xlsx ./storage/app/templates/shr-template.xlsx
@@ -123,6 +123,6 @@ CMD ["php-fpm"]
 FROM nginx:alpine AS web
 
 COPY nginx.conf /etc/nginx/conf.d/default.conf
-COPY --from=app /var/www/digisejahtera/public /var/www/digisejahtera/public
+COPY --from=app /var/www/digisejahtera-main/public /var/www/digisejahtera-main/public
 
 EXPOSE 80
