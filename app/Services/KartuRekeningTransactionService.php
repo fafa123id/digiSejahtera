@@ -457,9 +457,6 @@ class KartuRekeningTransactionService
         float $nominal,
         int $userId
     ): bool {
-        /*
-     * Cell kosong berarti user tidak jadi melakukan input.
-     */
         if (
             $this->nilaiKosong(
                 $rawValue
@@ -468,10 +465,6 @@ class KartuRekeningTransactionService
             return false;
         }
 
-        /*
-     * Reguler 0 diabaikan.
-     * Sebrak 0 tetap diproses sebagai pembayaran jasa.
-     */
         if (
             $jenis
             === Pinjaman::JENIS_REGULER
@@ -630,11 +623,6 @@ class KartuRekeningTransactionService
             abort(404);
         }
 
-        /*
-     * Jangan memakai kondisi $nominal <= 0 secara umum.
-     *
-     * Sebrak bernilai 0 harus tetap disimpan.
-     */
         $harusDihapus =
             $this->nilaiKosong(
                 $rawValue
