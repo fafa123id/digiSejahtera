@@ -13,9 +13,7 @@ use Inertia\Response;
 
 class PengurusController extends Controller
 {
-    /**
-     * Menampilkan daftar akun pengurus.
-     */
+
     public function index(Request $request): Response
     {
         $search = $request->string('search')
@@ -47,9 +45,6 @@ class PengurusController extends Controller
         ]);
     }
 
-    /**
-     * Menyimpan akun pengurus baru.
-     */
     public function store(
         StorePengurusRequest $request
     ): RedirectResponse {
@@ -76,9 +71,6 @@ class PengurusController extends Controller
         ]);
     }
 
-    /**
-     * Mengubah nama atau username pengurus.
-     */
     public function update(
         UpdatePengurusRequest $request,
         User $pengurus
@@ -97,9 +89,6 @@ class PengurusController extends Controller
         );
     }
 
-    /**
-     * Menghapus akun pengurus.
-     */
     public function destroy(
         User $pengurus
     ): RedirectResponse {
