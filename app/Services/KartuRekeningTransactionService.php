@@ -225,13 +225,16 @@ class KartuRekeningTransactionService
                     $berubah
                     && $hitungUlang
                 ) {
-                    $this
-                        ->pinjamanCalculationService
-                        ->hitungJasaDanSisaPinjaman(
-                            anggotaId: $anggota->id,
+                    $this->pinjamanCalculationService->hitungSisaPinjaman(
+                        anggotaId: $anggota->id,
+                        jenisPinjaman: $jenis,
+                        mulaiPeriode: $periode,
+                    );
 
-                            jenisPinjaman: $jenis,
-                        );
+                    $this->pinjamanCalculationService->hitungJasaPinjaman(
+                        anggotaId: $anggota->id,
+                        jenisPinjaman: $jenis,
+                    );
 
                     $this
                         ->shuService
@@ -303,13 +306,16 @@ class KartuRekeningTransactionService
                     $berubah
                     && $hitungUlang
                 ) {
-                    $this
-                        ->pinjamanCalculationService
-                        ->hitungJasaDanSisaPinjaman(
-                            anggotaId: $anggota->id,
+                    $this->pinjamanCalculationService->hitungSisaPinjaman(
+                        anggotaId: $anggota->id,
+                        jenisPinjaman: $jenis,
+                        mulaiPeriode: $periode,
+                    );
 
-                            jenisPinjaman: $jenis,
-                        );
+                    $this->pinjamanCalculationService->hitungJasaPinjaman(
+                        anggotaId: $anggota->id,
+                        jenisPinjaman: $jenis,
+                    );
 
                     $this
                         ->shuService

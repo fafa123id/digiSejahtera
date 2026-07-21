@@ -65,13 +65,16 @@ class KartuRekeningInlineService
                     $affectedLoanAccounts
                     as $account
                 ) {
-                    $this
-                        ->pinjamanCalculationService
-                        ->hitungJasaDanSisaPinjaman(
-                            anggotaId: $account['anggota_id'],
+                    $this->pinjamanCalculationService->hitungSisaPinjaman(
+                        anggotaId: $account['anggota_id'],
+                        jenisPinjaman: $account['jenis'],
+                        mulaiPeriode: $account['mulai_periode'],
+                    );
 
-                            jenisPinjaman: $account['jenis'],
-                        );
+                    $this->pinjamanCalculationService->hitungJasaPinjaman(
+                        anggotaId: $account['anggota_id'],
+                        jenisPinjaman: $account['jenis'],
+                    );
                 }
 
                 foreach (
@@ -296,20 +299,16 @@ class KartuRekeningInlineService
                         return;
                     }
 
-                    $affectedAnggotaIds[] =
-                        $anggota->id;
 
-                    $accountKey =
-                        $anggota->id
-                        . '|'
-                        . $jenis;
+                    $affectedAnggotaIds[] = $anggota->id;
+
+                    $accountKey = $anggota->id . '|' . $jenis;
+                    $periodeSebelumnya = $affectedLoanAccounts[$accountKey]['mulai_periode'] ?? null;
 
                     $affectedLoanAccounts[$accountKey] = [
-                        'anggota_id' =>
-                        $anggota->id,
-
-                        'jenis' =>
-                        $jenis,
+                        'anggota_id' => $anggota->id,
+                        'jenis' => $jenis,
+                        'mulai_periode' => $periodeSebelumnya && $periodeSebelumnya->lte($periode) ? $periodeSebelumnya : $periode,
                     ];
                 }
             );

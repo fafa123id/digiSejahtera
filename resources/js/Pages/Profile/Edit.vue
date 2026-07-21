@@ -8,10 +8,6 @@ import { Head } from '@inertiajs/vue3'
 import { ref } from 'vue'
 
 defineProps({
-  mustVerifyEmail: {
-    type: Boolean,
-    default: false,
-  },
 
   status: {
     type: String,
@@ -99,7 +95,6 @@ const closeToast = () => {
       >
         <section class="h-full rounded-3xl border border-blue-100 bg-white p-6 shadow-[0_8px_28px_rgba(26,111,189,0.08)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_16px_38px_rgba(26,111,189,0.14)]">
           <UpdateProfileInformationForm
-            :must-verify-email="mustVerifyEmail"
             :status="status"
             @saved="showToast('Informasi profil berhasil diperbarui.')"
           />

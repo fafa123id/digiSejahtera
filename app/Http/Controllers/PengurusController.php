@@ -58,7 +58,6 @@ class PengurusController extends Controller
         $pengurus = User::create([
             'name' => $request->validated('name'),
             'username' => $request->validated('username'),
-            'email' => null,
             'password' => $passwordSementara,
             'role' => User::ROLE_PENGURUS,
             'must_change_password' => true,

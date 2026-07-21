@@ -2,8 +2,6 @@
 
 use App\Http\Controllers\AnggotaController;
 use App\Http\Controllers\KartuRekeningController;
-use App\Http\Controllers\KartuRekeningExportController;
-use App\Http\Controllers\KartuRekeningInlineController;
 use App\Http\Controllers\LaporanController;
 use Illuminate\Support\Facades\Route;
 
@@ -11,11 +9,11 @@ Route::middleware('auth')
     ->group(function (): void {
         Route::get('/laporan/simpanan-hari-raya/export', [
             LaporanController::class,
-            'downloadSHR',
+            'exportSimpananHariRaya',
         ])->name('laporan.simpanan-hari-raya.export');
         Route::get('/laporan/tagihan-bulanan/export', [
             LaporanController::class,
-            'downloadTagihan',
+            'exportTagihanBulanan',
         ])->name('laporan.tagihan-bulanan.export');
         Route::get(
             '/kartu-rekening',
@@ -30,7 +28,7 @@ Route::middleware('auth')
         Route::patch(
             '/kartu-rekening',
             [
-                KartuRekeningInlineController::class,
+                KartuRekeningController::class,
                 'update',
             ]
         )->name(
@@ -69,7 +67,7 @@ Route::middleware('auth')
         Route::get(
             '/kartu-rekening/export',
             [
-                KartuRekeningExportController::class,
+                KartuRekeningController::class,
                 'download',
             ]
         )->name(

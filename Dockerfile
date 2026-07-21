@@ -95,6 +95,8 @@ COPY --chown=www-data:www-data .docker-secrets/templates/xlsx/template.xlsx ./st
 COPY --chown=www-data:www-data .docker-secrets/templates/xlsx/template-kitir.xlsx ./storage/app/templates/template-kitir.xlsx
 COPY --chown=www-data:www-data .docker-secrets/templates/xlsx/shr-template.xlsx ./storage/app/templates/shr-template.xlsx
 COPY --chown=www-data:www-data .docker-secrets/templates/xlsx/tagihan-template.xlsx ./storage/app/templates/tagihan-template.xlsx
+COPY --chown=www-data:www-data .docker-secrets/templates/xlsx/laporan-jasa-pinjaman-template.xls ./storage/app/templates/laporan-jasa-pinjaman-template.xls
+COPY --chown=www-data:www-data .docker-secrets/templates/xlsx/laporan-shu-template.xls ./storage/app/templates/laporan-shu-template.xls
 
 RUN composer dump-autoload \
   --no-dev \
