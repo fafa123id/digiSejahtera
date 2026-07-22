@@ -28,7 +28,6 @@ class Pinjaman extends Model
         'sisa_pinjaman',
         'status',
         'keterangan',
-        'created_by',
     ];
 
     protected function casts(): array
@@ -44,11 +43,6 @@ class Pinjaman extends Model
     public function anggota(): BelongsTo
     {
         return $this->belongsTo(Anggota::class);
-    }
-
-    public function pencatat(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'created_by');
     }
 
     public function angsurans(): HasMany
@@ -70,7 +64,10 @@ class Pinjaman extends Model
     {
         return $query->where('jenis_pinjaman', self::JENIS_SEBRAK);
     }
-
+    public function pencatat(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
     public function sudahLunas(): bool
     {
         return (float) $this->sisa_pinjaman <= 0;

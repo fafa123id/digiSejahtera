@@ -21,7 +21,6 @@ class Simpanan extends Model
         'simpanan_rekreasi',
         'jumlah_simpanan',
         'keterangan',
-        'created_by',
     ];
 
     protected function casts(): array
@@ -42,7 +41,7 @@ class Simpanan extends Model
         return $this->belongsTo(Anggota::class);
     }
 
-    public function pencatat(): BelongsTo
+        public function pencatat(): BelongsTo
     {
         return $this->belongsTo(User::class, 'created_by');
     }

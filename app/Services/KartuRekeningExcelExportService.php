@@ -39,9 +39,7 @@ class KartuRekeningExcelExportService
         $sheet->setTopLeftCell('A1');
         $sheet->setPaneTopLeftCell('A1');
     }
-    /**
-     * Menghasilkan file Excel kartu rekening seluruh anggota.
-     */
+
     public function generate(
         int $tahun
     ): string {
@@ -144,12 +142,6 @@ class KartuRekeningExcelExportService
         );
     }
 
-    /**
-     * Mengambil seluruh anggota yang belum dihapus permanen.
-     *
-     * Anggota nonaktif tetap dicetak agar histori kartu rekening
-     * tidak hilang.
-     */
     private function ambilSeluruhAnggota(
         int $tahun
     ): Collection {
@@ -216,12 +208,7 @@ class KartuRekeningExcelExportService
             ->get();
     }
 
-    /**
-     * Menyiapkan jumlah blok berdasarkan jumlah anggota.
-     *
-     * Template hanya memakai blok anggota pertama sebagai sumber
-     * formatting. Seluruh blok lain dibuat ulang secara dinamis.
-     */
+
     private function siapkanWorksheet(
         Worksheet $sheet,
         int $jumlahAnggota
@@ -229,9 +216,7 @@ class KartuRekeningExcelExportService
         $highestRow =
             $sheet->getHighestRow();
 
-        /*
-     * Sisakan satu blok pertama dari template sebagai pola.
-     */
+
         if (
             $highestRow
             > self::BLOCK_HEIGHT
@@ -244,10 +229,6 @@ class KartuRekeningExcelExportService
             );
         }
 
-        /*
-     * Pastikan blok pertama juga memakai struktur merge final,
-     * termasuk JUMLAH SIMPANAN yang merge vertikal 2 baris.
-     */
         $this->terapkanMergeBlok(
             sheet: $sheet,
             startRow: self::TEMPLATE_BLOCK_START,
@@ -292,9 +273,6 @@ class KartuRekeningExcelExportService
         }
     }
 
-    /**
-     * Menghapus nilai dan formula lama, tetapi mempertahankan style.
-     */
     private function hapusIsiBlok(
         Worksheet $sheet,
         int $startRow
@@ -329,9 +307,6 @@ class KartuRekeningExcelExportService
         }
     }
 
-    /**
-     * Menyalin style blok template pertama ke blok anggota berikutnya.
-     */
     private function salinFormatBlok(
         Worksheet $sheet,
         int $sourceStart,
@@ -383,9 +358,6 @@ class KartuRekeningExcelExportService
         }
     }
 
-    /**
-     * Merge cell mengikuti struktur template asli.
-     */
     private function terapkanMergeBlok(
         Worksheet $sheet,
         int $startRow
@@ -394,9 +366,6 @@ class KartuRekeningExcelExportService
             $startRow
             + self::TOTAL_ROW_OFFSET;
 
-        /*
-     * Bersihkan merge lama pada area blok ini agar aman.
-     */
         $ranges = [
             "B{$startRow}:F{$startRow}",
             "G{$startRow}:G" . ($startRow + 1),
@@ -419,10 +388,6 @@ class KartuRekeningExcelExportService
             "B{$startRow}:F{$startRow}"
         );
 
-        /*
-     * JUMLAH SIMPANAN merge vertikal 2 baris
-     * seperti JUMLAH TAGIHAN.
-     */
         $sheet->mergeCells(
             "G{$startRow}:G"
                 . (
@@ -456,9 +421,6 @@ class KartuRekeningExcelExportService
         );
     }
 
-    /**
-     * Membentuk data satu kartu rekening anggota.
-     */
     private function buatDataCetakAnggota(
         Anggota $anggota,
         int $tahun
@@ -533,10 +495,6 @@ class KartuRekeningExcelExportService
         $rows =
             [];
 
-        /*
-         * Baris DES sebelum Januari berisi saldo awal dari tahun
-         * sebelumnya, bukan transaksi baru.
-         */
         $rows[] = [
             'bulan' =>
             'DES',
@@ -652,9 +610,6 @@ class KartuRekeningExcelExportService
         ];
     }
 
-    /**
-     * Mengambil seluruh angsuran dari seluruh pencairan satu jenis pinjaman.
-     */
     private function ambilAngsuran(
         Collection $pinjamans
     ): Collection {
@@ -677,9 +632,6 @@ class KartuRekeningExcelExportService
             ->values();
     }
 
-    /**
-     * Menghitung saldo simpanan kumulatif sebelum Januari.
-     */
     private function hitungSaldoSimpananSebelum(
         Collection $simpanan,
         CarbonImmutable $periode
@@ -1004,9 +956,6 @@ class KartuRekeningExcelExportService
         ];
     }
 
-    /**
-     * Menulis satu blok anggota menggunakan format template.
-     */
     private function tulisBlokAnggota(
         Worksheet $sheet,
         int $startRow,
@@ -1027,9 +976,6 @@ class KartuRekeningExcelExportService
             $startRow
             + self::TOTAL_ROW_OFFSET;
 
-        /*
-     * Header anggota.
-     */
         $nomorAnggota =
             $this->formatNomorAnggota(
                 $data['nomor_anggota']
@@ -1071,11 +1017,6 @@ class KartuRekeningExcelExportService
             "JUMLAH\nTAGIHAN"
         );
 
-        /*
-     * Header kolom.
-     * Kolom G dikosongkan karena sudah merge vertikal
-     * dengan header JUMLAH SIMPANAN.
-     */
         $sheet->fromArray(
             [
                 [
@@ -1102,9 +1043,6 @@ class KartuRekeningExcelExportService
             "A{$columnHeaderRow}"
         );
 
-        /*
-     * Detail saldo awal dan transaksi bulanan.
-     */
         foreach (
             $data['rows']
             as $offset => $row
@@ -1158,9 +1096,6 @@ class KartuRekeningExcelExportService
             }
         }
 
-        /*
-     * Footer jumlah.
-     */
         $sheet->setCellValue(
             "A{$totalRow}",
             'JUMLAH'

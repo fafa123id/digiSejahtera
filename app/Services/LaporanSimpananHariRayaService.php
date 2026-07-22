@@ -8,14 +8,11 @@ use Illuminate\Support\Collection;
 
 class LaporanSimpananHariRayaService
 {
-    public function __construct(private readonly IdulFitriService $idulFitriService)
-    {
-    }
 
-    public function buatData(int $tahun): array
+    public function buatData(int $tahun, int $bulan): array
     {
         $awalTahun = CarbonImmutable::create($tahun, 1, 1)->startOfDay();
-        $tanggalIdulFitri = $this->idulFitriService->getTanggal($tahun);
+        $tanggalIdulFitri = CarbonImmutable::create($tahun, $bulan, 1)->startOfMonth();
         $akhirIslam = $tanggalIdulFitri->endOfMonth();
         $akhirNonIslam = CarbonImmutable::create($tahun, 12, 31)->endOfDay();
 

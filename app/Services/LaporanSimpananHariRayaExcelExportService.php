@@ -18,7 +18,7 @@ class LaporanSimpananHariRayaExcelExportService
 
     public function __construct(private readonly LaporanSimpananHariRayaService $laporanService) {}
 
-    public function generate(int $tahun): string
+    public function generate(int $tahun, int $bulan): string
     {
         $templatePath = storage_path('app/templates/shr-template.xlsx');
 
@@ -28,7 +28,7 @@ class LaporanSimpananHariRayaExcelExportService
 
         $sourceSpreadsheet = IOFactory::load($templatePath);
         $spreadsheet = IOFactory::load($templatePath);
-        $data = $this->laporanService->buatData($tahun);
+        $data = $this->laporanService->buatData($tahun, $bulan);
         $tanggalCetak = CarbonImmutable::now()->locale('id');
 
         $sourceIslam = $this->ambilSheet($sourceSpreadsheet, 'ISLAM');

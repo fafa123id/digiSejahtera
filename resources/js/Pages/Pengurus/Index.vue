@@ -241,10 +241,21 @@ const closePasswordModal = () => {
                 <div
                     class="absolute -right-16 -top-16 h-48 w-48 rounded-full bg-white/10"
                 />
-
                 <div
                     class="absolute -bottom-20 right-28 h-44 w-44 rounded-full bg-white/5"
                 />
+
+                <div class="absolute right-8 top-7 hidden gap-2 sm:flex">
+                    <span
+                        class="h-2 w-2 animate-pulse rounded-sm bg-white/40"
+                    />
+                    <span
+                        class="h-2 w-2 animate-pulse rounded-sm bg-white/60 [animation-delay:200ms]"
+                    />
+                    <span
+                        class="h-2 w-2 animate-pulse rounded-sm bg-white/80 [animation-delay:400ms]"
+                    />
+                </div>
 
                 <div class="relative">
                     <p

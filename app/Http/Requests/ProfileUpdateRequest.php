@@ -29,20 +29,6 @@ class ProfileUpdateRequest extends FormRequest
                     $this->user()->id
                 ),
             ],
-
-            'email' => [
-                'required',
-                'string',
-                'lowercase',
-                'email',
-                'max:255',
-                Rule::unique(
-                    User::class,
-                    'email'
-                )->ignore(
-                    $this->user()->id
-                ),
-            ],
         ];
     }
 
@@ -60,15 +46,6 @@ class ProfileUpdateRequest extends FormRequest
 
             'username.unique' =>
                 'Username sudah digunakan.',
-
-            'email.required' =>
-                'Email harus diisi.',
-
-            'email.email' =>
-                'Format email tidak valid.',
-
-            'email.unique' =>
-                'Email sudah digunakan.',
         ];
     }
 }

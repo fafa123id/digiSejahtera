@@ -20,7 +20,13 @@ const props = defineProps({
     },
 });
 
-const emit = defineEmits(["change", "discard", "delete", "keluarkan"]);
+const emit = defineEmits([
+    "change",
+    "discard",
+    "delete",
+    "keluarkan",
+    "autofill",
+]);
 
 const simpananFields = [
     {
@@ -313,7 +319,8 @@ const nominalClass = (value) => {
                         class="transition hover:bg-blue-50/60"
                     >
                         <td
-                            class="border border-blue-100 bg-blue-50/40 px-3 py-2 font-black text-[#1a6fbd]"
+                            class="cursor-pointer border border-blue-100 bg-blue-50/40 px-3 py-2 font-black text-[#1a6fbd] transition hover:bg-blue-100"
+                            @click="$emit('autofill', member.id, row.periode)"
                         >
                             {{ row.bulan }}
                         </td>

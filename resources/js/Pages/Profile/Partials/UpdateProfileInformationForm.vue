@@ -4,11 +4,6 @@ import { Link, useForm, usePage } from '@inertiajs/vue3'
 import { computed } from 'vue'
 
 const props = defineProps({
-  mustVerifyEmail: {
-    type: Boolean,
-    default: false,
-  },
-
   status: {
     type: String,
     default: '',
@@ -28,7 +23,6 @@ const user = computed(() => {
 const form = useForm({
   name: user.value.name,
   username: user.value.username,
-  email: user.value.email,
 })
 
 const submit = () => {
@@ -67,7 +61,7 @@ const submit = () => {
         </h2>
 
         <p class="mt-1 text-sm leading-6 text-slate-500">
-          Ubah nama, username, dan email akun yang digunakan pada sistem.
+          Ubah nama dan username akun yang digunakan pada sistem.
         </p>
       </div>
     </header>
@@ -94,47 +88,8 @@ const submit = () => {
         required
       />
 
-      <FormInput
-        v-model="form.email"
-        label="Email"
-        type="email"
-        placeholder="Masukkan alamat email"
-        autocomplete="email"
-        :error="form.errors.email"
-        required
-      />
-
-      <div
-        v-if="
-          mustVerifyEmail
-          && user.email_verified_at === null
-        "
-        class="rounded-xl border border-orange-100 bg-orange-50 px-4 py-3 text-xs leading-5 text-orange-700"
-      >
-        <p>
-          Alamat email belum diverifikasi.
-        </p>
-
-        <Link
-          :href="route('verification.send')"
-          method="post"
-          as="button"
-          class="mt-2 font-bold text-[#1a6fbd] underline underline-offset-2"
-        >
-          Kirim ulang tautan verifikasi
-        </Link>
-
-        <p
-          v-if="status === 'verification-link-sent'"
-          class="mt-2 font-bold text-[#3aab2e]"
-        >
-          Tautan verifikasi baru telah dikirim ke alamat email Anda.
-        </p>
-      </div>
-
       <div class="rounded-xl border border-blue-100 bg-blue-50/60 px-4 py-3 text-xs leading-5 text-slate-500">
-        Username digunakan untuk login. Email disimpan sebagai informasi akun
-        dan dapat digunakan untuk kebutuhan verifikasi atau pemulihan akun.
+        Username digunakan untuk login. Pastikan username yang dipilih unik dan mudah diingat.
       </div>
 
       <div class="flex justify-end">

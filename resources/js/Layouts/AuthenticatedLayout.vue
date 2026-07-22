@@ -38,6 +38,11 @@ const menus = [
         href: "/laporan",
         icon: "report",
     },
+    {
+        label: "Riwayat Transaksi",
+        href: "/riwayat-transaksi",
+        icon: "history",
+    },
 ];
 
 const visibleMenus = computed(() => {
@@ -91,11 +96,13 @@ onUnmounted(() => {
             <div
                 class="flex h-20 items-center gap-3 border-b border-blue-50 px-6"
             >
-                <img
-                    src="/images/logo.webp"
-                    alt="Logo DigiSejahtera"
-                    class="h-12 w-12 object-contain drop-shadow-sm"
-                />
+                <Link :href="route('dashboard')" class="flex items-center gap-3">
+                    <img
+                        src="/images/logo.webp"
+                        alt="Logo DigiSejahtera"
+                        class="h-12 w-12 object-contain drop-shadow-sm"
+                    />
+                </Link>
 
                 <div>
                     <p class="text-xl font-black tracking-tight">
@@ -244,7 +251,8 @@ onUnmounted(() => {
                             <p
                                 class="text-xs font-bold uppercase tracking-[0.18em] text-[#3aab2e]"
                             >
-                                DigiSejahtera
+                                <span class="text-[#1a6fbd]">Digi</span>
+                                <span class="text-[#3aab2e]">Sejahtera</span>
                             </p>
 
                             <h1

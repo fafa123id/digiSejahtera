@@ -17,7 +17,6 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'username',
-        'email',
         'password',
         'role',
         'must_change_password',
@@ -31,13 +30,21 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
-            'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'must_change_password' => 'boolean',
         ];
     }
 
-    public function simpanansDibuat(): HasMany
+    public function isAdmin(): bool
+    {
+        return $this->role === self::ROLE_ADMIN;
+    }
+
+    public function isPengurus(): bool
+    {
+        return $this->role === self::ROLE_PENGURUS;
+    }
+        public function simpanansDibuat(): HasMany
     {
         return $this->hasMany(Simpanan::class, 'created_by');
     }
@@ -52,13 +59,4 @@ class User extends Authenticatable
         return $this->hasMany(Angsuran::class, 'created_by');
     }
 
-    public function isAdmin(): bool
-    {
-        return $this->role === self::ROLE_ADMIN;
-    }
-
-    public function isPengurus(): bool
-    {
-        return $this->role === self::ROLE_PENGURUS;
-    }
 }

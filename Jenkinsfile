@@ -40,6 +40,14 @@ pipeline {
                 file(
                     credentialsId: 'laporantagihan-digisejahtera',
                     variable: 'LAPORANTAGIHAN_XLSX_FILE'
+                ),
+                file(
+                    credentialsId: 'laporanjasapinjaman-digisejahtera',
+                    variable: 'LAPORANJASAPINJAMAN_XLS_FILE'
+                ),
+                file(
+                    credentialsId: 'laporanshu-digisejahtera',
+                    variable: 'LAPORANSHU_XLS_FILE'
                 )
             ]) {
                 sh '''
@@ -49,6 +57,8 @@ pipeline {
                     cp "$KITIR_XLSX_FILE" ".docker-secrets/templates/xlsx/template-kitir.xlsx"
                     cp "$LAPORANSHR_XLSX_FILE" ".docker-secrets/templates/xlsx/shr-template.xlsx"
                     cp "$LAPORANTAGIHAN_XLSX_FILE" ".docker-secrets/templates/xlsx/tagihan-template.xlsx"
+                    cp "$LAPORANJASAPINJAMAN_XLS_FILE" ".docker-secrets/templates/xlsx/laporan-jasa-pinjaman-template.xls"
+                    cp "$LAPORANSHU_XLS_FILE" ".docker-secrets/templates/xlsx/laporan-shu-template.xls"
                 '''
             }
         }
