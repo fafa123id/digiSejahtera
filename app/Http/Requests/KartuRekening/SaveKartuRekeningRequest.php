@@ -271,7 +271,7 @@ class SaveKartuRekeningRequest extends FormRequest
         ?string $field,
         mixed $value
     ): void {
-        if (!in_array($field, ['nama', 'agama'], true)) {
+        if (!in_array($field, ['nama', 'agama', 'tanggal_masuk'], true)) {
             $validator->errors()->add("changes.{$index}.field", 'Field anggota tidak valid.');
 
             return;
@@ -284,9 +284,14 @@ class SaveKartuRekeningRequest extends FormRequest
 
             return;
         }
-
+        if ($field === 'tanggal_masuk') {
+            if (!is_string($value) || trim($value) === '') {
+                $validator->errors()->add("changes.{$index}.value", 'Tanggal bergabung harus diisi.');
+            }
+            return;
+        }
         if (!in_array($value, [Anggota::AGAMA_ISLAM, Anggota::AGAMA_NONISLAM], true)) {
-            $validator->errors()->add("changes.{$index}.value", 'Agama anggota tidak valid.');
+            $validator->errors()->add("changes.{$index}.value", 'Agama harus diisi.');
         }
     }
 
