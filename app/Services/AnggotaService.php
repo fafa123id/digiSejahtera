@@ -58,11 +58,6 @@ class AnggotaService
     public function hapus(
         Anggota $anggota
     ): void {
-        if ($anggota->status === Anggota::STATUS_AKTIF) {
-            throw ValidationException::withMessages([
-                'anggota' => 'Anggota masih aktif, tidak bisa dihapus.',
-            ]);
-        }
 
         DB::transaction(function () use ($anggota) {
             $anggota->forceDelete();
