@@ -128,6 +128,7 @@ const emitTanggalMasuk = (value) => {
 };
 
 const emitAgama = (value) => {
+<<<<<<< HEAD
     emit("change", {
         anggota_id: props.member.id,
 
@@ -137,6 +138,16 @@ const emitAgama = (value) => {
         section: "anggota",
         field: "agama",
         value: value === "" ? null : value,
+=======
+    const nilaiAgama = ["islam", "nonislam"].includes(value) ? value : null;
+
+    emit("change", {
+        anggota_id: props.member.id,
+        periode: periodeAnggota(),
+        section: "anggota",
+        field: "agama",
+        value: nilaiAgama,
+>>>>>>> 0e542ed (feat: Enhance EditableTextField and KartuRekeningSheet components with improved value handling and emit logic)
     });
 };
 </script>
@@ -204,12 +215,58 @@ const emitAgama = (value) => {
                         class="rounded-lg bg-orange-50 px-2 py-1 text-[11px] font-bold text-orange-600"
                     >
                         Belum disimpan
+<<<<<<< HEAD
+=======
+                    </span>
+                </div>
+                <div
+                    v-if="!printMode"
+                    class="no-print mt-3 flex flex-wrap items-center gap-2"
+                >
+                    <span class="mr-1 text-xs font-bold text-slate-500">
+                        Agama:
+>>>>>>> 0e542ed (feat: Enhance EditableTextField and KartuRekeningSheet components with improved value handling and emit logic)
                     </span>
                 </div>
                 <div class="no-print mt-3 flex flex-wrap items-center gap-2">
                     <label
+<<<<<<< HEAD
                         :for="`agama-${member.id}`"
                         class="text-xs font-bold text-slate-500"
+=======
+                        class="flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-1.5 transition"
+                        :class="
+                            member.agama === null ||
+                            member.agama === undefined ||
+                            member.agama === ''
+                                ? 'border-[#1a6fbd] bg-blue-50 text-[#1a6fbd] ring-2 ring-blue-100'
+                                : 'border-slate-200 bg-white text-slate-500 hover:border-blue-200'
+                        "
+                    >
+                        <input
+                            :checked="
+                                member.agama === null ||
+                                member.agama === undefined ||
+                                member.agama === ''
+                            "
+                            type="radio"
+                            :name="`agama-${member.id}`"
+                            value=""
+                            class="h-3.5 w-3.5 border-slate-300 text-[#1a6fbd] focus:ring-[#1a6fbd]"
+                            @change="emitAgama(null)"
+                        />
+
+                        <span class="text-xs font-bold"> Belum diisi </span>
+                    </label>
+
+                    <label
+                        class="flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-1.5 transition"
+                        :class="
+                            member.agama === 'islam'
+                                ? 'border-[#1a6fbd] bg-blue-50 text-[#1a6fbd] ring-2 ring-blue-100'
+                                : 'border-slate-200 bg-white text-slate-500 hover:border-blue-200'
+                        "
+>>>>>>> 0e542ed (feat: Enhance EditableTextField and KartuRekeningSheet components with improved value handling and emit logic)
                     >
                         Agama:
                     </label>
