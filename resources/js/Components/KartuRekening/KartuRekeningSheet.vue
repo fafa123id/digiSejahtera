@@ -63,27 +63,6 @@ const isDirty = (periode, section, field) => {
     return Boolean(props.dirtyKeys[makeKey(periode, section, field)]);
 };
 
-const emitNama = (value) => {
-    emit("change", {
-        anggota_id: props.member.id,
-        periode:
-            props.member.rows[0]?.periode ?? `${new Date().getFullYear()}-01`,
-        section: "anggota",
-        field: "nama",
-        value,
-    });
-};
-const emitAgama = (value) => {
-    emit("change", {
-        anggota_id: props.member.id,
-        periode:
-            props.member.rows[0]?.periode ?? `${new Date().getFullYear()}-01`,
-        section: "anggota",
-        field: "agama",
-        value,
-    });
-};
-
 const emitSimpanan = (row, field, value) => {
     emit("change", {
         anggota_id: props.member.id,
@@ -123,6 +102,42 @@ const formatNumber = (value, accounting = false) => {
 const nominalClass = (value) => {
     return Number(value ?? 0) < 0 ? "text-red-600" : "text-slate-700";
 };
+const periodeAnggota = () => {
+    return props.member.rows[0]?.periode ?? `${new Date().getFullYear()}-01`;
+};
+
+const emitNama = (value) => {
+    emit("change", {
+        anggota_id: props.member.id,
+        periode: periodeAnggota(),
+        section: "anggota",
+        field: "nama",
+        value,
+    });
+};
+
+const emitTanggalMasuk = (value) => {
+    emit("change", {
+        anggota_id: props.member.id,
+        periode: periodeAnggota(),
+        section: "anggota",
+        field: "tanggal_masuk",
+
+        value: value === "" || value === undefined ? null : value,
+    });
+};
+
+const emitAgama = (value) => {
+    const nilaiAgama = ["islam", "nonislam"].includes(value) ? value : null;
+
+    emit("change", {
+        anggota_id: props.member.id,
+        periode: periodeAnggota(),
+        section: "anggota",
+        field: "agama",
+        value: nilaiAgama,
+    });
+};
 </script>
 
 <template>
@@ -150,14 +165,46 @@ const nominalClass = (value) => {
                     />
                 </div>
 
-                <p class="mt-1 text-xs text-slate-400">
-                    Bergabung:
-                    {{ member.tanggal_masuk ?? "-" }}
-                    · Status:
+                <div
+                    class="mt-2 flex flex-wrap items-center gap-2 text-xs text-slate-400"
+                >
+                    <span>Bergabung:</span>
+
+                    <EditableTextField
+                        :model-value="member.tanggal_masuk"
+                        input-type="date"
+                        nullable
+                        empty-label="-"
+                        :dirty="
+                            isDirty(
+                                member.rows[0]?.periode,
+                                'anggota',
+                                'tanggal_masuk',
+                            )
+                        "
+                        :readonly="printMode"
+                        @change="emitTanggalMasuk"
+                    />
+
+                    <span>· Status:</span>
+
                     <span class="font-bold capitalize">
                         {{ member.status }}
                     </span>
-                </p>
+
+                    <span
+                        v-if="
+                            isDirty(
+                                member.rows[0]?.periode,
+                                'anggota',
+                                'tanggal_masuk',
+                            )
+                        "
+                        class="rounded-lg bg-orange-50 px-2 py-1 text-[11px] font-bold text-orange-600"
+                    >
+                        Belum disimpan
+                    </span>
+                </div>
                 <div
                     v-if="!printMode"
                     class="no-print mt-3 flex flex-wrap items-center gap-2"
@@ -165,6 +212,32 @@ const nominalClass = (value) => {
                     <span class="mr-1 text-xs font-bold text-slate-500">
                         Agama:
                     </span>
+
+                    <label
+                        class="flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-1.5 transition"
+                        :class="
+                            member.agama === null ||
+                            member.agama === undefined ||
+                            member.agama === ''
+                                ? 'border-[#1a6fbd] bg-blue-50 text-[#1a6fbd] ring-2 ring-blue-100'
+                                : 'border-slate-200 bg-white text-slate-500 hover:border-blue-200'
+                        "
+                    >
+                        <input
+                            :checked="
+                                member.agama === null ||
+                                member.agama === undefined ||
+                                member.agama === ''
+                            "
+                            type="radio"
+                            :name="`agama-${member.id}`"
+                            value=""
+                            class="h-3.5 w-3.5 border-slate-300 text-[#1a6fbd] focus:ring-[#1a6fbd]"
+                            @change="emitAgama(null)"
+                        />
+
+                        <span class="text-xs font-bold"> Belum diisi </span>
+                    </label>
 
                     <label
                         class="flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-1.5 transition"
