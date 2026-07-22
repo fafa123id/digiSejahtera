@@ -58,35 +58,41 @@ class AnggotaService
     public function hapus(
         Anggota $anggota
     ): void {
-        if (
-            $anggota->simpanans()->exists()
-            || $anggota->pinjamans()->exists()
-            || $anggota->shuAnggotas()->exists()
-        ) {
+        if ($anggota->status === Anggota::STATUS_AKTIF) {
             throw ValidationException::withMessages([
-                'anggota' =>
-                'Data anggota tidak dapat dihapus karena memiliki riwayat transaksi. Gunakan tombol keluarkan anggota.',
+                'anggota' => 'Anggota masih aktif, tidak bisa dihapus.',
             ]);
         }
 
         $anggota->forceDelete();
-    }
+        DB::transaction(function () use ($anggota) {
 
+            $nomor = (int) $anggota->nomor_anggota;
+
+            $anggota->forceDelete();
+
+            Anggota::whereRaw('CAST(nomor_anggota AS UNSIGNED) > ?', [$nomor])
+                ->orderBy('nomor_anggota')
+                ->get()
+                ->each(function (Anggota $item) {
+                    $item->update([
+                        'nomor_anggota' => str_pad(
+                            (string) ((int) $item->nomor_anggota - 1),
+                            3,
+                            '0',
+                            STR_PAD_LEFT
+                        ),
+                    ]);
+                });
+        });
+    }
     private function buatNomorAnggotaBerikutnya(): string
     {
-        $nomorTerakhir = Anggota::withTrashed()
-            ->pluck('nomor_anggota')
-            ->map(
-                fn(string $nomor): int =>
-                (int) $nomor
-            )
-            ->max() ?? 0;
-
         return str_pad(
-            string: (string) ($nomorTerakhir + 1),
-            length: 3,
-            pad_string: '0',
-            pad_type: STR_PAD_LEFT,
+            (string) (Anggota::count() + 1),
+            3,
+            '0',
+            STR_PAD_LEFT
         );
     }
 }
