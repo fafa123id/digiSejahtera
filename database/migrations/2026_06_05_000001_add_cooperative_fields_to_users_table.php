@@ -12,9 +12,6 @@ return new class extends Migration
             $table->string('username', 50)
                 ->nullable()
                 ->unique();
-            $table->string('email')
-                ->nullable()
-                ->change();
             $table->string('role', 20)
                 ->default('pengurus');
             $table->boolean('must_change_password')
@@ -31,9 +28,6 @@ return new class extends Migration
                 'role',
                 'must_change_password',
             ]);
-            $table->string('email')
-                ->nullable(false)
-                ->change();
         });
     }
 };
