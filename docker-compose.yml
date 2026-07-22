@@ -21,6 +21,8 @@ services:
     command: >
       sh -c "
       [ -f .env ] || cp .env.example .env &&
+      mkdir -p storage/app/templates &&
+      cp -n docker-file/* storage/app/templates/ || true 
       composer install &&
       php artisan key:generate --force || true &&
       until pg_isready -h db -p 5432 -U postgres; do
@@ -40,6 +42,7 @@ services:
 
     volumes:
       - .:/var/www/digisejahtera
+      - vendor:/var/www/digisejahtera/vendor
       - node_modules:/var/www/digisejahtera/node_modules
 
     ports:
