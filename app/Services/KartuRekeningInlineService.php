@@ -122,6 +122,11 @@ class KartuRekeningInlineService
                         'agama' => $change['value'],
                     ]);
                 }
+                if ($change['field'] === 'tanggal_masuk') {
+                    $anggota->update([
+                        'tanggal_masuk' => $change['value'],
+                    ]);
+                }
 
                 $affectedAnggotaIds[] = $anggota->id;
             });
