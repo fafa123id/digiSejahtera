@@ -1,5 +1,5 @@
 <script setup>
-import { nextTick, ref, watch } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 
 const props = defineProps({
   modelValue: {
@@ -16,6 +16,21 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+
+  inputType: {
+    type: String,
+    default: 'text',
+  },
+
+  nullable: {
+    type: Boolean,
+    default: false,
+  },
+
+  emptyLabel: {
+    type: String,
+    default: '-',
+  },
 })
 
 const emit = defineEmits([
@@ -25,6 +40,18 @@ const emit = defineEmits([
 const editing = ref(false)
 const inputRef = ref(null)
 const inputValue = ref('')
+
+const displayValue = computed(() => {
+  if (
+    props.modelValue === null
+    || props.modelValue === undefined
+    || props.modelValue === ''
+  ) {
+    return props.emptyLabel
+  }
+
+  return String(props.modelValue)
+})
 
 watch(
   () => props.modelValue,
@@ -49,7 +76,14 @@ const startEditing = async () => {
   await nextTick()
 
   inputRef.value?.focus()
-  inputRef.value?.select()
+
+  if (props.inputType === 'text') {
+    inputRef.value?.select()
+  }
+
+  if (props.inputType === 'date') {
+    inputRef.value?.showPicker?.()
+  }
 }
 
 const stopEditing = () => {
@@ -61,23 +95,45 @@ const cancelEditing = () => {
   editing.value = false
 }
 
+const normalizeValue = (value) => {
+  if (
+    props.nullable
+    && (
+      value === null
+      || value === undefined
+      || String(value).trim() === ''
+    )
+  ) {
+    return null
+  }
+
+  return value
+}
+
 const handleInput = (event) => {
   inputValue.value = event.target.value
-  emit('change', inputValue.value)
+
+  emit(
+    'change',
+    normalizeValue(inputValue.value),
+  )
 }
 </script>
 
 <template>
-  <span v-if="readonly" class="font-black text-slate-800">
-    {{ modelValue }}
+  <span
+    v-if="readonly"
+    class="font-black text-slate-800"
+  >
+    {{ displayValue }}
   </span>
 
   <input
     v-else-if="editing"
     ref="inputRef"
     :value="inputValue"
-    type="text"
-    class="w-full max-w-md rounded-lg border border-[#1a6fbd] bg-white px-2 py-1 text-xl font-black text-slate-800 outline-none ring-2 ring-blue-100"
+    :type="inputType"
+    class="w-full max-w-md rounded-lg border border-[#1a6fbd] bg-white px-2 py-1 text-sm font-black text-slate-800 outline-none ring-2 ring-blue-100"
     @input="handleInput"
     @blur="stopEditing"
     @keydown.enter.prevent="$event.target.blur()"
@@ -95,8 +151,8 @@ const handleInput = (event) => {
     "
     @click="startEditing"
   >
-    <span class="text-xl font-black">
-      {{ modelValue }}
+    <span class="font-black">
+      {{ displayValue }}
     </span>
 
     <svg
