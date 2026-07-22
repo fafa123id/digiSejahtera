@@ -206,31 +206,53 @@ const emitAgama = (value) => {
                         Belum disimpan
                     </span>
                 </div>
-                <div class="no-print mt-3 flex flex-wrap items-center gap-2">
-                    <label
-                        :for="`agama-${member.id}`"
-                        class="text-xs font-bold text-slate-500"
-                    >
+                <div
+                    v-if="!printMode"
+                    class="no-print mt-3 flex flex-wrap items-center gap-2"
+                >
+                    <span class="mr-1 text-xs font-bold text-slate-500">
                         Agama:
+                    </span>
+
+                    <label
+                        class="flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-1.5 transition"
+                        :class="
+                            member.agama === 'islam'
+                                ? 'border-[#1a6fbd] bg-blue-50 text-[#1a6fbd] ring-2 ring-blue-100'
+                                : 'border-slate-200 bg-white text-slate-500 hover:border-blue-200'
+                        "
+                    >
+                        <input
+                            :checked="member.agama === 'islam'"
+                            type="radio"
+                            :name="`agama-${member.id}`"
+                            value="islam"
+                            class="h-3.5 w-3.5 border-slate-300 text-[#1a6fbd] focus:ring-[#1a6fbd]"
+                            @change="emitAgama('islam')"
+                        />
+
+                        <span class="text-xs font-bold"> Islam </span>
                     </label>
 
-                    <select
-                        :id="`agama-${member.id}`"
-                        :value="member.agama ?? ''"
-                        class="min-w-[150px] cursor-pointer rounded-xl border bg-white px-3 py-2 text-xs font-bold outline-none transition focus:border-[#1a6fbd] focus:ring-2 focus:ring-blue-100"
+                    <label
+                        class="flex cursor-pointer items-center gap-2 rounded-lg border px-3 py-1.5 transition"
                         :class="
-                            isDirty(member.rows[0]?.periode, 'anggota', 'agama')
-                                ? 'border-orange-300 bg-orange-50 text-orange-700 ring-2 ring-orange-100'
-                                : 'border-slate-200 text-slate-700 hover:border-blue-300'
+                            member.agama === 'nonislam'
+                                ? 'border-[#1a6fbd] bg-blue-50 text-[#1a6fbd] ring-2 ring-blue-100'
+                                : 'border-slate-200 bg-white text-slate-500 hover:border-blue-200'
                         "
-                        @change="emitAgama($event.target.value)"
                     >
-                        <option value="">--</option>
+                        <input
+                            :checked="member.agama === 'nonislam'"
+                            type="radio"
+                            :name="`agama-${member.id}`"
+                            value="nonislam"
+                            class="h-3.5 w-3.5 border-slate-300 text-[#1a6fbd] focus:ring-[#1a6fbd]"
+                            @change="emitAgama('nonislam')"
+                        />
 
-                        <option value="islam">Islam</option>
-
-                        <option value="nonislam">Non-Islam</option>
-                    </select>
+                        <span class="text-xs font-bold"> Non-Islam </span>
+                    </label>
 
                     <span
                         v-if="
