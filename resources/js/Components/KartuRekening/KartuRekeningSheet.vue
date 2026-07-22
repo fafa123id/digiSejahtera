@@ -167,7 +167,7 @@ const emitAgama = (value) => {
                 </div>
 
                 <div
-                    class="mt-2 flex flex-wrap items-center gap-2 text-xs text-slate-400"
+                    class="mt-1 flex flex-wrap items-center gap-1 text-xs font-normal text-slate-400"
                 >
                     <span>Bergabung:</span>
 
@@ -175,6 +175,7 @@ const emitAgama = (value) => {
                         :model-value="member.tanggal_masuk"
                         input-type="date"
                         nullable
+                        compact
                         empty-label="-"
                         :dirty="
                             isDirty(
@@ -187,9 +188,9 @@ const emitAgama = (value) => {
                         @change="emitTanggalMasuk"
                     />
 
-                    <span>· Status:</span>
+                    <span>Status:</span>
 
-                    <span class="font-bold capitalize">
+                    <span class="font-normal capitalize">
                         {{ member.status }}
                     </span>
 
@@ -201,7 +202,7 @@ const emitAgama = (value) => {
                                 'tanggal_masuk',
                             )
                         "
-                        class="rounded-lg bg-orange-50 px-2 py-1 text-[11px] font-bold text-orange-600"
+                        class="ml-1 text-[10px] font-normal text-orange-600"
                     >
                         Belum disimpan
                     </span>
