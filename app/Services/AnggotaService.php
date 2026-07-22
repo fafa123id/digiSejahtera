@@ -64,14 +64,12 @@ class AnggotaService
             ]);
         }
 
-        $anggota->forceDelete();
         DB::transaction(function () use ($anggota) {
-
-            $nomor = (int) $anggota->nomor_anggota;
-
             $anggota->forceDelete();
 
-            Anggota::whereRaw('CAST(nomor_anggota AS UNSIGNED) > ?', [$nomor])
+            $nomor = $anggota->nomor_anggota;
+
+            Anggota::where('nomor_anggota', '>', $nomor)
                 ->orderBy('nomor_anggota')
                 ->get()
                 ->each(function (Anggota $item) {
@@ -80,7 +78,7 @@ class AnggotaService
                             (string) ((int) $item->nomor_anggota - 1),
                             3,
                             '0',
-                            STR_PAD_LEFT
+                            STR_PAD_LEFT,
                         ),
                     ]);
                 });
