@@ -331,7 +331,18 @@ class SaveKartuRekeningRequest extends FormRequest
         ) {
             return;
         }
+        if (
+            $value < 0  
+        ) {
+            $validator
+                ->errors()
+                ->add(
+                    "changes.{$index}.value",
+                    'Nominal simpanan harus berupa angka valid.'
+                );
 
+            return;
+        }
         if (
             !$this->nominalValid(
                 $value
