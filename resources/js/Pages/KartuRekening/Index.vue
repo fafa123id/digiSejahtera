@@ -69,7 +69,7 @@ const saveProcessing = ref(false);
 const showChooseDateModal = ref(false);
 const anggotaForm = useForm({
     nama: "",
-    agama: "islam",
+    agama: "",
     tanggal_masuk: "",
 });
 
