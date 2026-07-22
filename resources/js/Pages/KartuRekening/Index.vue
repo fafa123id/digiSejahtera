@@ -879,7 +879,7 @@ const autoFillRow = (anggotaId, periode) => {
             <AnggotaFormModal
                 :show="showAnggotaModal"
                 :form="anggotaForm"
-                @close="showAnggotaModal = false"
+                @close="anggotaForm.reset(); showAnggotaModal = false"
                 @submit="submitAnggota"
             />
 
