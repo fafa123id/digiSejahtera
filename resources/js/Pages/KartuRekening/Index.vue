@@ -69,7 +69,7 @@ const saveProcessing = ref(false);
 const showChooseDateModal = ref(false);
 const anggotaForm = useForm({
     nama: "",
-    agama: "islam",
+    agama: "",
     tanggal_masuk: "",
 });
 
@@ -879,7 +879,7 @@ const autoFillRow = (anggotaId, periode) => {
             <AnggotaFormModal
                 :show="showAnggotaModal"
                 :form="anggotaForm"
-                @close="showAnggotaModal = false"
+                @close="anggotaForm.reset(); showAnggotaModal = false"
                 @submit="submitAnggota"
             />
 

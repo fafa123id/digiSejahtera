@@ -31,6 +31,10 @@ const props = defineProps({
     type: String,
     default: '-',
   },
+  compact: {
+  type: Boolean,
+  default: false,
+},
 })
 
 const emit = defineEmits([
@@ -123,7 +127,11 @@ const handleInput = (event) => {
 <template>
   <span
     v-if="readonly"
-    class="font-black text-slate-800"
+    :class="
+      compact
+        ? 'text-xs font-normal text-slate-400'
+        : 'font-black text-slate-800'
+    "
   >
     {{ displayValue }}
   </span>
@@ -133,7 +141,11 @@ const handleInput = (event) => {
     ref="inputRef"
     :value="inputValue"
     :type="inputType"
-    class="w-full max-w-md rounded-lg border border-[#1a6fbd] bg-white px-2 py-1 text-sm font-black text-slate-800 outline-none ring-2 ring-blue-100"
+    :class="
+      compact
+        ? 'w-[125px] rounded-md border border-[#1a6fbd] bg-white px-1.5 py-0.5 text-xs font-normal text-slate-600 outline-none ring-1 ring-blue-100'
+        : 'w-full max-w-md rounded-lg border border-[#1a6fbd] bg-white px-2 py-1 text-xl font-black text-slate-800 outline-none ring-2 ring-blue-100'
+    "
     @input="handleInput"
     @blur="stopEditing"
     @keydown.enter.prevent="$event.target.blur()"
@@ -143,21 +155,41 @@ const handleInput = (event) => {
   <button
     v-else
     type="button"
-    class="group flex max-w-md items-center gap-2 rounded-lg border px-2 py-1 text-left transition"
+    class="group inline-flex items-center text-left transition"
     :class="
-      dirty
-        ? 'border-orange-300 bg-orange-50 text-orange-700 ring-2 ring-orange-100'
-        : 'border-transparent text-slate-800 hover:border-blue-200 hover:bg-white/70'
+      compact
+        ? [
+            'gap-1 border-0 bg-transparent p-0 text-xs font-normal',
+            dirty
+              ? 'text-orange-600'
+              : 'text-slate-400 hover:text-[#1a6fbd]',
+          ]
+        : [
+            'max-w-md gap-2 rounded-lg border px-2 py-1',
+            dirty
+              ? 'border-orange-300 bg-orange-50 text-orange-700 ring-2 ring-orange-100'
+              : 'border-transparent text-slate-800 hover:border-blue-200 hover:bg-white/70',
+          ]
     "
     @click="startEditing"
   >
-    <span class="font-black">
+    <span
+      :class="
+        compact
+          ? 'text-xs font-normal'
+          : 'text-xl font-black'
+      "
+    >
       {{ displayValue }}
     </span>
 
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      class="h-3.5 w-3.5 opacity-0 transition group-hover:opacity-60"
+      :class="
+        compact
+          ? 'h-3 w-3 opacity-0 transition group-hover:opacity-60'
+          : 'h-3.5 w-3.5 opacity-0 transition group-hover:opacity-60'
+      "
       fill="none"
       viewBox="0 0 24 24"
       stroke="currentColor"

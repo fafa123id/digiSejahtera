@@ -47,9 +47,9 @@ class StoreAnggotaRequest extends FormRequest
             'tanggal_masuk.date' =>
             'Tanggal bergabung tidak valid.',
             'agama.required' =>
-                'Agama anggota harus diisi.',
+                'Agama harus diisi.',
             'agama.in' =>
-                'Agama anggota tidak valid, silakan pilih agama yang tersedia.',
+                'Agama harus diisi',
         ];
     }
 }
