@@ -17,8 +17,37 @@ pipeline {
 
         stage('Create .env from Credentials') {
             steps {
-                withCredentials([file(credentialsId: 'digisejahtera-env-dev', variable: 'DOTENV_FILE')]) {
-                    sh "cp \$DOTENV_FILE .env"
+                withCredentials([
+            file(
+                credentialsId: 'digisejahtera-env-dev',
+                variable: 'DOTENV_FILE'
+            )
+        ]) {
+                    sh '''
+                set -eu
+
+                echo "Memeriksa credential file..."
+
+                if [ ! -f "$DOTENV_FILE" ]; then
+                    echo "ERROR: Credential file tidak ditemukan"
+                    exit 1
+                fi
+
+                if [ ! -r "$DOTENV_FILE" ]; then
+                    echo "ERROR: Credential file tidak bisa dibaca"
+                    exit 1
+                fi
+
+                cp "$DOTENV_FILE" .env
+                chmod 600 .env
+
+                if [ ! -s .env ]; then
+                    echo "ERROR: File .env kosong"
+                    exit 1
+                fi
+
+                echo ".env berhasil dibuat"
+            '''
                 }
             }
         }
