@@ -24,7 +24,7 @@ class AppServiceProvider extends ServiceProvider
         if ($this->app->environment('staging')) {
             URL::forceScheme('https');
         }
-        if (app()->environment('production')) {
+        if ($this->app->environment('production')) {
             URL::forceScheme('https');
         }
         Vite::prefetch(concurrency: 3);
