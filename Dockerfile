@@ -1,7 +1,7 @@
 # =========================
 # Stage 0: PHP base
 # =========================
-FROM php:8.4-fpm AS php_base
+FROM php:8.5.12-fpm AS php_base
 
 RUN set -eux; \
   apt-get update; \
@@ -39,7 +39,7 @@ RUN set -eux; \
   ; \
   rm -rf /var/lib/apt/lists/*
 
-COPY --from=composer:2.8.10 /usr/bin/composer /usr/bin/composer
+COPY --from=composer:2.11.1 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/digisejahtera
 
@@ -64,7 +64,7 @@ RUN composer install \
 # =========================
 # Stage 2: Vite production assets
 # =========================
-FROM node:22-alpine AS vite_build
+FROM node:26.13-alpine AS vite_build
 
 WORKDIR /var/www/digisejahtera
 
